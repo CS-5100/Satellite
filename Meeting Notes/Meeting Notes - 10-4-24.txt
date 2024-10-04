@@ -1,0 +1,19 @@
+Meeting Notes - 10/4/24
+~~~~~~~~~~~~~~~~~~~~~~~~
+- To calculate the surface area cover, we use an estimation of a Ka-band transmitter with a half-power beamwidth of 45 degrees; this is common amongst many commercial providers
+-We use this angle and a specific satellite's altitude to calculate the radius of a cone, and generate surface area based on the circle on the bottom face of the cone.
+-Specific formula used: 
+- area = pi * (altitude * tan(45 degrees / 2))^2
+-Dan provided us a visualization of the satellites locations based on the positions we calculated yesterday. 
+-Gil proposed Montecarlo dot placement to find overlaps
+-Akhilesh mentioned Haversine formula
+
+Next Steps:
+- We would need a way to visualize the surface area coverage of each satellite in the representation Dan gave us. 
+- We need a method to find overlaps in surface area coverage 
+- We need to find a way to map this ^^^^ found area to "land" or "ocean"
+- Total area covered - overlaps would be a great scoring function
+
+Aside:
+- We could also keep intersatellite distance in mind as a scoring function as well. -Aniket
+- Maximize for the largest intersatellite distance possible 
