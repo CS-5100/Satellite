@@ -106,7 +106,8 @@ def tles_to_dataframe(input_file_name: str, time: datetime, add_radius = False, 
     
     return output
 
-def tles_to_geodataframe(input_file_name: str, time: datetime, crs_string: str, add_radius = False, add_area=False, angle = 45.0):
+def tles_to_geodataframe(input_file_name: str, time: datetime, crs_string: str,
+                         add_radius = False, add_area=False, set_crs = False, angle = 45.0):
     
     # create the DataFrame object from the TLE file
     df = tles_to_dataframe(input_file_name=input_file_name,
@@ -123,7 +124,8 @@ def tles_to_geodataframe(input_file_name: str, time: datetime, crs_string: str, 
     gdf = gpd.GeoDataFrame(df)
     
     # set the Coordinate Reference System from the user input
-    gdf = gdf.set_crs(pyj.CRS.from_user_input(crs_string))
+    if set_crs:
+        gdf = gdf.set_crs(pyj.CRS.from_user_input(crs_string))
     
     return gdf
 
