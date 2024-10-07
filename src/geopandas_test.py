@@ -46,6 +46,10 @@ map_filepath = dirpath / "ne_10m_land.zip"
 world_map = gpd.read_file(filename=map_filepath)
 world_map = world_map.to_crs(common_crs)
 
+# Tested that this map file does actually label the areas that are land
+# so a spatial join will probably be able to get us land area
+print(world_map.head())
+
 # showing the plot
 fig, ax = plt.subplots()
 world_map.plot(ax=ax)
