@@ -27,38 +27,32 @@ def tles_to_dataframe(input_file_name: str, time: datetime):
     with open(input_file_path, 'r') as input_file:
         tle_lines = [line.strip() for line in input_file.readlines()]
     
-    # create slices for each type of line
-    
-    # the first element of every three elements is the name
-    tle_names = tle_lines[::3]
-    
-    # the second element of every three elements is the first TLE line
-    tle_lines_1 = tle_lines[1::3]
-    
-    # the last element of every three elements is the second TLE line
-    tle_lines_2 = tle_lines[2::3]
-    
-    # Check that all the TLEs have the appropriate number of lines
-    if len(tle_names) != len(tle_lines_1) or len(tle_lines_1) != len(tle_lines_2):
+    # Ensure each TLE has 3 lines
+    if len(tle_lines) % 3 != 0:
         print("The TLE file is unbalanced and does not have the appropriate number of lines")
         return None
-    
-    # initialization of empty lists
-    satellite = []
-    longitude = []
-    latitude = []
-    altitude = []
+
+    # Initialize lists for storing satellite data
+    satellites = []
+    longitudes = []
+    latitudes = []
+    altitudes = []
+    errors = []
 
     # across all TLE entries
-    for i, name in enumerate(tle_names):
+    for i in range(0, len(tle_lines), 3):
+        
+        name = tle_lines[i]
+        tle_line_1 = tle_lines[i+1]
+        tle_line_2 = tle_lines[i+2]
         
         if 'DTC' in name:
             continue
         
         # create an Orbital object
         orbital_object = Orbital(satellite=name,
-                                 line1=tle_lines_1[i],
-                                 line2=tle_lines_2[i])
+                                 line1=tle_line_1,
+                                 line2=tle_line_2)
         
         # I kept getting NotImplementedError:
         # 'Mode "Near-space, simplified equations" not implemented', so
@@ -71,15 +65,15 @@ def tles_to_dataframe(input_file_name: str, time: datetime):
             continue
         
         # append the values to the appropriate lists
-        satellite.append(name)
-        longitude.append(current_lon)
-        latitude.append(current_lat)
-        altitude.append(current_alt)
+        satellites.append(name)
+        longitudes.append(current_lon)
+        latitudes.append(current_lat)
+        altitudes.append(current_alt)
         
-    output = pd.DataFrame({"Satellite": satellite,
-                           "Longitude": longitude,
-                           "Latitude": latitude,
-                           "Altitude": altitude})
+    output = pd.DataFrame({"Satellite": satellites,
+                           "Longitude": longitudes,
+                           "Latitude": latitudes,
+                           "Altitude": altitudes})
     
     return output
 
