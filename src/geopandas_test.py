@@ -35,7 +35,9 @@ world_map = world_map.to_crs(common_crs)
 
 # Tested that this map file does actually label the areas that are land
 # so a spatial join will probably be able to get us land area
-# print(world_map.head())
+print(world_map.head())
+print(starlink.head())
+
 
 # showing the plot
 fig, ax = plt.subplots()
