@@ -7,7 +7,7 @@ import pyproj as pyj
 import geopandas as gpd
 
 # Function to process TLEs into a DataFrame object
-def tles_to_dataframe(input_file_name: str, time: datetime, add_radius = False, add_area = False, angle = 45.0):
+def tles_to_dataframe(input_file_name: str, time: datetime, angle = 45.0):
     
     # Define data directory and input file
     dirpath = Path(__file__).parent.resolve() / ".." / "data"
@@ -22,16 +22,11 @@ def tles_to_dataframe(input_file_name: str, time: datetime, add_radius = False, 
         print("The TLE file is unbalanced and does not have the appropriate number of lines")
         return None
 
-    if add_area and not add_radius:
-        print("Radii must be calculated if coverage areas are requested, change both parameters to True")
-        return None
-
     # Initialize lists for satellite data
-    satellites, longitudes, latitudes, altitudes = [], [], [], []
-    not_implemented_errors, crashed_errors = [], []
-    
-    radii = [] if add_radius else None
-    areas = [] if add_area else None
+    satellites = [] # parameters directly pulled from TLE lines
+    longitudes, latitudes, altitudes = [], [], [] # parameters calculated with pyorbital
+    radii, areas = [], [] # parameters calculated in the code
+    not_implemented_errors, crashed_errors = [], [] # error code
 
     # across all TLE entries
     for i in range(0, len(tle_lines), 3):
@@ -64,15 +59,13 @@ def tles_to_dataframe(input_file_name: str, time: datetime, add_radius = False, 
             latitudes.append(current_lat)
             altitudes.append(current_alt)
             
-            # if a radius needs to be added, add a calculated radius with the given
-            # field of view angle
-            if add_radius:
-                radius = current_alt * np.tan(angle / 2.0)
-                radii.append(radius)
-                
-                if add_area:
-                    area = np.pi * radius**2
-                    areas.append(area)
+            # add a calculated radius with the given field of view angle
+            # and area just in case
+            radius = current_alt * np.tan(angle / 2.0)
+            area = np.pi * radius**2
+            
+            radii.append(radius)
+            areas.append(area)
                 
         except NotImplementedError: 
             not_implemented_errors.append(name)  # Collect errors for logging if necessary
@@ -86,13 +79,10 @@ def tles_to_dataframe(input_file_name: str, time: datetime, add_radius = False, 
         "Satellite": satellites,
         "Longitude": longitudes,
         "Latitude": latitudes,
-        "Altitude": altitudes
+        "Altitude": altitudes,
+        "Radius": radii,
+        "Area": areas
     }
-    
-    if add_radius:
-        data["Radius"] = radii
-        if add_area:
-            data["Area"] = areas
     
     output = pd.DataFrame(data)
     
@@ -107,13 +97,11 @@ def tles_to_dataframe(input_file_name: str, time: datetime, add_radius = False, 
     return output
 
 def tles_to_geodataframe(input_file_name: str, time: datetime, crs_string: str,
-                         add_radius = False, add_area=False, set_crs = False, angle = 45.0):
+                         set_crs = False, buffer_points = True, angle = 45.0):
     
     # create the DataFrame object from the TLE file
     df = tles_to_dataframe(input_file_name=input_file_name,
                            time=time,
-                           add_radius=add_radius,
-                           add_area=add_area,
                            angle=angle)
     
     # adding the Shapely object geometries from the data
