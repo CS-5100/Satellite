@@ -1,0 +1,15 @@
+Made a list of what we'd need to do for the particle swarm optimization - Aniket
+ 
+Code deliverables:
+-function to compute total unique area coverage
+-fitness function that uses the above area coverage function 
+-function that, given a list of all of the satellites, checks if ALL satellites meet distance constraints (10km to 100 km)
+-function to calculate intersatellite distance
+-figure out how to define each satellite as a "particle" for the model  (defining a "position" and "velocity" of each particle which ARE SEPARATE meanings and not physics related) 
+ 
+ 
+Once those are complete, we do:
+-The main Particle Swarm Optimization loop
+ 
+
+Even if we do not move forward with PSO, some of these functions will be helpful regardless for local search in general
