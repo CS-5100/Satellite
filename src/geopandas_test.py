@@ -19,12 +19,11 @@ common_crs = pyj.CRS.from_proj4("+proj=eck4")
 # create a GeoDataFrame object
 starlink = tlp.tles_to_geodataframe(input_file_name=dirpath/"starlink_tle_06OCT2024_21_22.txt",
                                       time=datetime.now(timezone.utc),
-                                      crs_string="4326",
-                                      add_radius=True,
-                                      add_area=True,
-                                      set_crs=True)
+                                      buffer_points=True,
+                                      angle=20.0)
 
 # projecting the data to the Eckert IV equal area projection
+starlink = starlink.set_crs(epsg="4326")
 starlink = starlink.to_crs(common_crs)
 
 # create a map projection that can be reasoned about
