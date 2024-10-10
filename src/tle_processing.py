@@ -1,10 +1,14 @@
+# select import statements
 from pyorbital.orbital import Orbital
 from datetime import datetime, timezone
 from pathlib import Path
+
+# full package import statements
 import pandas as pd
 import numpy as np
 import pyproj as pyj
 import geopandas as gpd
+import shapely as sp
 
 # Function to process TLEs into a DataFrame object
 def tles_to_dataframe(input_file_name: str, time: datetime, angle = 45.0):
@@ -96,8 +100,8 @@ def tles_to_dataframe(input_file_name: str, time: datetime, angle = 45.0):
     
     return output
 
-def tles_to_geodataframe(input_file_name: str, time: datetime, crs_string: str,
-                         set_crs = False, buffer_points = True, angle = 45.0):
+def tles_to_geodataframe(input_file_name: str, time: datetime,
+                         buffer_points = True, angle = 45.0):
     
     # create the DataFrame object from the TLE file
     df = tles_to_dataframe(input_file_name=input_file_name,
@@ -105,23 +109,34 @@ def tles_to_geodataframe(input_file_name: str, time: datetime, crs_string: str,
                            angle=angle)
     
     # adding the Shapely object geometries from the data
-    df["geometry"] = gpd.points_from_xy(x=df["Longitude"],
+    if buffer_points:
+        # create the point objects as a pandas Series object of Shapely Point objects
+        df["points"] = gpd.points_from_xy(x=df["Longitude"],
+                                        y=df["Latitude"])
+        
+        # approach 1
+        # define an anonymous function for generating a buffer Shapely Polygon object
+        # from each point with a given buffer and use that within a pd.Combine call
+        df["geometry"] = df["points"].combine(df["Radius"],
+                                              lambda x, y: x.buffer(y))
+        
+        # approach 2
+        # geometry_list = []
+        # for i in range(len(df["points"])):
+        #     geometry_list.append(sp.buffer(df["points"].iloc[i], df["Radius"].iloc[i]))
+            
+        # df["geometry"] = geometry_list
+    else:
+        df["geometry"] = gpd.points_from_xy(x=df["Longitude"],
                                         y=df["Latitude"])
     
-    # generate the GeoDataFrame object
-    gdf = gpd.GeoDataFrame(df)
-    
-    # set the Coordinate Reference System from the user input
-    if set_crs:
-        gdf = gdf.set_crs(pyj.CRS.from_user_input(crs_string))
-    
-    return gdf
+    return gpd.GeoDataFrame(df)
 
 # simple impromptu test code
 # test = tles_to_dataframe("example_starlink_tle.txt", datetime.now(timezone.utc))
 # test = tles_to_dataframe("starlink_tle_06OCT2024_21_22.txt", datetime.now(timezone.utc))
-# test = tles_to_geodataframe("example_starlink_tle.txt", datetime.now(timezone.utc),
-#                             "+proj=eck4 +datum=WGS84", add_radius=True, add_area=True)
+# test = tles_to_geodataframe(input_file_name="starlink_tle_06OCT2024_21_22.txt",
+#                             time=datetime.now(timezone.utc))
 # print(test.head())
 # print(len(test))
 
