@@ -178,11 +178,18 @@ def calculate_group_union_area(group, satellite_data):
 # Step 6: Calculate the total unique coverage area
 # ----------------------------------------------------------
 
+# Earth's total surface area in km²
+earth_surface_area_km2 = 510072000
+
 # Calculate unique area for each connected component (group of satellites)
 total_unique_area = 0
 for group in connected_components:
     group_unique_area = calculate_group_union_area(group, satellite_data)
     total_unique_area += group_unique_area
 
-# Display the total unique coverage area
+# Calculate percentage of Earth's surface covered
+coverage_percentage = (total_unique_area / earth_surface_area_km2) * 100
+
+# Display the total unique coverage area and the percentage of Earth's surface covered
 print(f"Total Unique Coverage Area: {total_unique_area} km²")
+print(f"Percentage of Earth's Surface Covered: {coverage_percentage:.2f}%")
