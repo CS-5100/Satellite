@@ -40,7 +40,7 @@ def check_distance_constraints(position):
     for i in range(NUM_SATELLITES):
         for j in range(i + 1, NUM_SATELLITES):
             distance = calculate_distance(position[i], position[j])  # Define how to calculate distance
-            if distance < 10 or distance > 100:
+            if distance < 10 or distance > 150:
                 return False
     return True
 
