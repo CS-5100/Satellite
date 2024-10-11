@@ -25,6 +25,9 @@ def fitness_function(position):
         coverage *= 0.5  # Penalize if constraints are not satisfied
         
     return coverage
+    #NOTE: The fitness function can be modified based on the problem requirements!
+    #EX:  = a * coverage + b * distance + c * ...
+
 
 def compute_unique_area_coverage(position):
     # Implement the logic to calculate the unique area coverage
