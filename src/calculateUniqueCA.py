@@ -162,7 +162,7 @@ def calculate_group_union_area(group, satellite_data):
                     if distance < (r1 + r2):
                         overlap = circle_overlap_area(r1, r2, distance)
                         # Cap the overlap to avoid over-subtraction for large groups
-                        overlap = min(overlap, 0.3 * min(calculate_circle_area(r1),
+                        overlap = min(overlap, 0.25 * min(calculate_circle_area(r1),
                                                          calculate_circle_area(r2)))
                         overlap_area += overlap
 
