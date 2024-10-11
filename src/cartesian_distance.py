@@ -6,14 +6,41 @@ from datetime import datetime
 a = 6378.137  # semi-major axis (km)
 b = 6356.752  # semi-minor axis (km)
 
-# Example TLE
-tle1 = ["STARLINK-1282", 
-        "1 45409C 20019BB  24277.72826389  .00028003  00000+0  18758-2 0  2773", 
-        "2 45409  53.0537 319.7978 0001531  80.1330 356.1358 15.06379228    11"]
+# Satellite names to extract TLE from the file
+satellite1 = "STARLINK-6317"
+satellite2 = "STARLINK-30090"
 
-tle2 = ["STARLINK-32206", 
-        "1 60273C 24131U   24277.42965278 -.00009268  00000+0 -27528-3 0  2776", 
-        "2 60273  53.1574 322.0487 0001076  86.9170 331.2866 15.34232211    10"]
+# File path of the most recent TLE
+file_path = "/data/starlink_tle_2024-10-11_17-39-18.txt"
+
+def read_tle_from_file(file_path, satellite):
+    """
+    Reads a text file containing the specific TLE data and returns it as a dictionary with satellite names as keys.
+    
+    Parameters:
+    - file_path: The path to the file containing the TLE data.
+    
+    Returns:
+    - tle_dict: A dictionary with satellite names as keys and their TLE data as values.
+    """
+    tle_dict = {}
+
+    with open(file_path, 'r') as f:
+        lines = f.readlines()
+        for i in range(0, len(lines), 3):
+            # Extract satellite name, TLE line 1 and TLE line 2
+            satellite_name = lines[i].strip()
+            if satellite_name == satellite:
+                tle_line1 = lines[i + 1].strip()
+                tle_line2 = lines[i + 2].strip()
+
+                # Store in dictionary
+                tle_dict[satellite_name] = [satellite_name, tle_line1, tle_line2]
+
+            else: 
+                continue
+            
+    return tle_dict
 
 def tle_to_lat_long_alt(tle):
     satellite1 = Orbital(tle[0], line1=tle[1], line2=tle[2])
@@ -45,6 +72,11 @@ def geodetic_to_ecef(lat, lon, alt):
     
     return X, Y, Z
 
+# TLE from file
+tle1 = read_tle_from_file(file_path, satellite1).get(satellite1)
+tle2 = read_tle_from_file(file_path, satellite2).get(satellite2)
+
+
 # Example TLE extracted lat, lon, alt (in degrees and km)
 lon1, lat1, alt1 = tle_to_lat_long_alt(tle1)
 lon2, lat2, alt2 = tle_to_lat_long_alt(tle2)
@@ -57,4 +89,4 @@ X2, Y2, Z2 = geodetic_to_ecef(lat2, lon2, alt2)
 distance = np.sqrt(((X2 - X1)**2) + ((Y2 - Y1)**2) + ((Z2 - Z1)**2))
 
 # Print the result
-print(f"Distance between STARLINK-1282 and STARLINK-32206: {distance:.2f} km")
+print(f"Distance = {distance:.2f} km")
