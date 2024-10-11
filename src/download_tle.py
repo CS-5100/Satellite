@@ -1,5 +1,5 @@
 import requests
-from datetime import datetime
+from datetime import datetime, timezone
 
 def download_tle_data(url):
     """
@@ -15,7 +15,8 @@ def download_tle_data(url):
         response.raise_for_status()  # Raise an exception for HTTP errors
 
         # Get the current date and time to format the filename
-        current_time = datetime.utcnow().strftime("%Y-%m-%d_%H-%M-%S")
+        current_time = datetime.now(timezone.utc).strftime("%Y-%m-%d_%H-%M-%S")
+        # current_time = datetime.utcnow().strftime("%Y-%m-%d_%H-%M-%S")
         filename = f"starlink_tle_{current_time}.txt"
 
         # Save the content to a text file
