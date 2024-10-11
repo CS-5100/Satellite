@@ -110,17 +110,33 @@ def tles_to_geodataframe(input_file_name: str, time: datetime,
     
     # adding the Shapely object geometries from the data
     if buffer_points:
-        # create the point objects as a pandas Series object of Shapely Point objects
-        df["points"] = gpd.points_from_xy(x=df["Longitude"],
-                                        y=df["Latitude"])
         
-        # approach 1
-        # define an anonymous function for generating a buffer Shapely Polygon object
-        # from each point with a given buffer and use that within a pd.Combine call
-        df["geometry"] = df["points"].combine(df["Radius"],
-                                              lambda x, y: x.buffer(y))
+        # approach 3
+        df["geometry"] = gpd.points_from_xy(x=df["Longitude"],
+                                            y=df["Latitude"])
         
-        # approach 2
+        
+        # make the GeoDataFrame object and then do the buffering
+        gdf = gpd.GeoDataFrame(df)
+        
+        # approach 4
+        gdf["geometry"] = gdf["geometry"].buffer(distance=gdf["Radius"])
+        
+        # # approach 3
+        # gdf["geometry"] = gdf["geometry"].combine(df["Radius"],
+        #                                           lambda x, y: x.buffer(y))
+        
+        # # create the point objects as a pandas Series object of Shapely Point objects
+        # df["points"] = gpd.points_from_xy(x=df["Longitude"],
+        #                                 y=df["Latitude"])
+        
+        # # approach 1
+        # # define an anonymous function for generating a buffer Shapely Polygon object
+        # # from each point with a given buffer and use that within a pd.Combine call
+        # df["geometry"] = df["points"].combine(df["Radius"],
+        #                                       lambda x, y: x.buffer(y))
+        
+        # # approach 2
         # geometry_list = []
         # for i in range(len(df["points"])):
         #     geometry_list.append(sp.buffer(df["points"].iloc[i], df["Radius"].iloc[i]))
@@ -129,8 +145,10 @@ def tles_to_geodataframe(input_file_name: str, time: datetime,
     else:
         df["geometry"] = gpd.points_from_xy(x=df["Longitude"],
                                         y=df["Latitude"])
+        
+        gdf = gpd.GeoDataFrame(df)
     
-    return gpd.GeoDataFrame(df)
+    return gdf
 
 # simple impromptu test code
 # test = tles_to_dataframe("example_starlink_tle.txt", datetime.now(timezone.utc))
