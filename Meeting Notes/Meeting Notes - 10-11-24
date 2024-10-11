@@ -1,9 +1,5 @@
-Made a sample PSO loop for when we finish all of the helper functions. - Aniket
+Came up with an idea to help minimize computation of distance constraint: -Aniket
 
-Additionally, I have an idea to save computation on distances:
--We implement zone-based coverage above Earth such that we make large spheres (3D) around Earth
--and if all of these zones have at least one satellite, we know that the distance criteria is met. 
-
--Only computation then left is when we place satellites to ensure they aren't immediately within 10km of any existing craft. 
-
--Check zonescoverage.png
+-We implement zone-based coverage above Earth such that we make equally space large spheres (3D) around Earth with a pre-determined radius; let's say 50 km for now
+-If all of these zones have at least one satellite, we know that all satellites regardless of placement will be able to communicate with the rest of the network
+-Only computation that would be left is when we place satellites to ensure they aren't immediately within 10km of any existing craft. 
