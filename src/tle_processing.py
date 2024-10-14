@@ -1,7 +1,8 @@
 # select import statements
-from pyorbital.orbital import Orbital
-from datetime import datetime, timezone
 from pathlib import Path
+from datetime import datetime, timezone
+from pyorbital.orbital import Orbital
+
 
 # full package import statements
 import pandas as pd
@@ -10,36 +11,40 @@ import pyproj as pyj
 import geopandas as gpd
 import shapely as sp
 
-# Function to process TLEs into a DataFrame object
-def tles_to_dataframe(input_file_name: str, time: datetime, angle = 45.0):
-    
-    # Define data directory and input file
-    dirpath = Path(__file__).parent.resolve() / ".." / "data"
-    input_file_path = dirpath / input_file_name
-    
-    # Extract the TLEs from the file and strip whitespace
-    with open(input_file_path, 'r') as input_file:
-        tle_lines = [line.strip() for line in input_file.readlines()]
-    
-    # Ensure each TLE has 3 lines
-    if len(tle_lines) % 3 != 0:
-        print("The TLE file is unbalanced and does not have the appropriate number of lines")
-        return None
+def tle_lines_to_lists(lines: list, filter_dtc = False,
+                       time=datetime.now(timezone.utc)):
+    """Takes a list of strings containing the lines of TLE data and converts them
+    to a set of identifiers, coordinates, and thrown errors
 
+    Args:
+        lines (list): The TLE data in the form of a list of strings
+        filter_dtc (bool, optional): Whether or not to exclude [DTC] labeled satellites.
+            Defaults to False.
+        time (datetime, optional): The time to be used for calculation of orbital parameters.
+            Defaults to datetime.now(timezone.utc).
+
+    Returns:
+        tuple(satellites, longitudes, latitudes, altitudes, not_implemented_errors, crashed_errors):
+            a tuple of lists with the following parameters
+                - satellites (list(str)): the name of each satellite
+                - longitudes (list(float)): the longitude of each satellite in decimal degrees
+                - latitudes (list(float)): the latitude of each satellite in decimal degrees
+                - altitudes (list(float)): the altitude of each satellite in kilometers
+                - not_implemented_errors (list(str)): the name of each satellite that calculations fail for
+                - crashed_errors (list(str)): the name of each satellite that is calculated to have crashed
+    """
     # Initialize lists for satellite data
     satellites = [] # parameters directly pulled from TLE lines
     longitudes, latitudes, altitudes = [], [], [] # parameters calculated with pyorbital
-    radii, areas = [], [] # parameters calculated in the code
     not_implemented_errors, crashed_errors = [], [] # error code
-
-    # across all TLE entries
-    for i in range(0, len(tle_lines), 3):
+    
+    for i in range(0, len(lines), 3):
         
-        name = tle_lines[i]
-        tle_line_1 = tle_lines[i+1]
-        tle_line_2 = tle_lines[i+2]
+        name = lines[i]
+        tle_line_1 = lines[i+1]
+        tle_line_2 = lines[i+2]
         
-        if 'DTC' in name:
+        if filter_dtc and 'DTC' in name:
             continue
         
         # I kept getting NotImplementedError:
@@ -49,6 +54,7 @@ def tles_to_dataframe(input_file_name: str, time: datetime, angle = 45.0):
         
         # I also got some satellites throwing errors that they have been calculated to
         # have crashed, so I put a branch handling that eventuality
+        
         try:
             # create an Orbital object
             orbital_object = Orbital(satellite=name,
@@ -63,20 +69,48 @@ def tles_to_dataframe(input_file_name: str, time: datetime, angle = 45.0):
             latitudes.append(current_lat)
             altitudes.append(current_alt)
             
-            # add a calculated radius with the given field of view angle
-            # and area just in case
-            radius = current_alt * np.tan(angle / 2.0)
-            area = np.pi * radius**2
-            
-            radii.append(radius)
-            areas.append(area)
-                
         except NotImplementedError: 
             not_implemented_errors.append(name)  # Collect errors for logging if necessary
         except Exception as e:
             if "crash" in str(e):
                 crashed_errors.append(name)
                 
+    return satellites, longitudes, latitudes, altitudes, not_implemented_errors, crashed_errors
+
+# Function to process TLEs into a DataFrame object
+def tles_to_dataframe(input_file_name: str, time: datetime, angle = 45.0):
+    """Take a downloaded text file of TLE data generated at a specific datetime and
+    generate a pandas DataFrame from the data as longitude, latitude, altitude triplets
+
+    Args:
+        input_file_name (str): _description_
+        time (datetime): _description_
+        angle (float, optional): _description_. Defaults to 45.0.
+
+    Returns:
+        _type_: _description_
+    """
+    # Define data directory and input file
+    dirpath = Path(__file__).parent.resolve() / ".." / "data" / "tle_text_files"
+    input_file_path = dirpath / input_file_name
+    
+    # Extract the TLEs from the file and strip whitespace
+    with open(input_file_path, 'r') as input_file:
+        tle_lines = [line.strip() for line in input_file.readlines()]
+    
+    # Ensure each TLE has 3 lines
+    if len(tle_lines) % 3 != 0:
+        print("The TLE file is unbalanced and does not have the appropriate number of lines")
+        return None
+
+    # turn the lines from the text file into orbital parameters
+    satellites, longitudes, latitudes, altitudes, not_implemented_errors, crashed_errors = tle_lines_to_lists(tle_lines,
+                                                                                                              filter_dtc=True,
+                                                                                                              time=time)
+
+    radii = [altitude * np.tan(angle / 2.0) for altitude in altitudes]
+    
+    areas = [np.pi * radius ** 2 for radius in radii]
     
     # create the output DataFrame Object
     data = {
@@ -102,7 +136,18 @@ def tles_to_dataframe(input_file_name: str, time: datetime, angle = 45.0):
 
 def tles_to_geodataframe(input_file_name: str, time: datetime,
                          buffer_points = True, angle = 45.0):
-    
+    """Take a downloaded text file of TLE data generated at a specific datetime and
+    generate a pandas DataFrame from the data as longitude, latitude, altitude triplets
+
+    Args:
+        input_file_name (str): _description_
+        time (datetime): _description_
+        buffer_points (bool, optional): _description_. Defaults to True.
+        angle (float, optional): _description_. Defaults to 45.0.
+
+    Returns:
+        _type_: _description_
+    """
     # create the DataFrame object from the TLE file
     df = tles_to_dataframe(input_file_name=input_file_name,
                            time=time,
@@ -152,6 +197,7 @@ def tles_to_geodataframe(input_file_name: str, time: datetime,
 
 # simple impromptu test code
 # test = tles_to_dataframe("example_starlink_tle.txt", datetime.now(timezone.utc))
+# print(test.head())
 # test = tles_to_dataframe("starlink_tle_06OCT2024_21_22.txt", datetime.now(timezone.utc))
 # test = tles_to_geodataframe(input_file_name="starlink_tle_06OCT2024_21_22.txt",
 #                             time=datetime.now(timezone.utc))
