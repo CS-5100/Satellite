@@ -33,3 +33,5 @@ land_map.plot(ax=ax, color="#228B22")
 ocean_map.plot(ax=ax, color="#246BCE")
 starlink_gpd.plot(ax=ax, color="#C51E3A", markersize = 1)
 plt.show()
+
+# TODO: figure out projection to cartesian coordinate system then buffer
