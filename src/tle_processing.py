@@ -132,18 +132,18 @@ def tles_to_dataframe(
 
     # create the output DataFrame Object
     data = {
-        "Satellites": satellites,
-        "Longitudes": longitudes,
-        "Latitudes": latitudes,
-        "Altitudes": altitudes,
+        "Satellite": satellites,
+        "Longitude": longitudes,
+        "Latitude": latitudes,
+        "Altitude": altitudes,
     }
 
     # if requested calculate radii and projected areas and add them to the data
     if calculate_radii_areas:
         radii = [altitude * np.tan(angle / 2.0) for altitude in altitudes]
         areas = [np.pi * radius**2 for radius in radii]
-        data["Radii"] = radii
-        data["Areas"] = areas
+        data["Radius"] = radii
+        data["Area"] = areas
 
     output = pd.DataFrame(data)
 
@@ -160,7 +160,6 @@ def tles_to_dataframe(
         )
 
     return output
-
 
 # def tles_to_geodataframe(input_file_name: str, time: datetime,
 #                          buffer_points = True, angle = 45.0):
