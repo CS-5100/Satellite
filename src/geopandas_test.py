@@ -76,3 +76,7 @@ print(land_all_areas_square_km)
 print(EARTH_LAND_AREA_SQ_KM)
 print(earth_area)
 print(EARTH_SURFACE_AREA_SQ_KM)
+
+# land area comparison doesn't make sense given we need intersection logic
+# can't do this for land area yet
+print(starlink_all_areas_square_km / earth_area) 
