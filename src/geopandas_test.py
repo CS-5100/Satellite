@@ -8,6 +8,10 @@ import numpy as np
 import geopandas as gpd
 import download_tle as dtl
 
+# defining a few constants
+EARTH_SURFACE_AREA_SQ_KM = 509600000
+EARTH_LAND_AREA_SQ_KM = 148326000
+
 # defining the data directory as a relative path
 dirpath = Path(__file__).parent.resolve() / ".." / "data"
 
@@ -53,12 +57,22 @@ starlink_valid = starlink_gpd[starlink_gpd['geometry'].is_valid]
 fig, ax = plt.subplots()
 land_map.plot(ax=ax, color="#228B22")
 ocean_map.plot(ax=ax, color="#246BCE")
-starlink_gpd.plot(ax=ax, color="#C51E3A")
+starlink_valid.plot(ax=ax, color="#C51E3A")
 # starlink_gpd_points.plot(ax=ax, color="#C51E3A", markersize = 1)
 plt.show()
 
 # getting the total area covered by all satellites in square meters
 starlink_all_areas = starlink_valid['geometry'].union_all()
-print(starlink_all_areas.area)
-EARTH_SURFACE_AREA_SQ_KM = 509600000
-EARTH_LAND_AREA_SQ_KM = 148326000
+land_all = land_map['geometry'].union_all()
+ocean_all = ocean_map['geometry'].union_all()
+
+starlink_all_areas_square_km = starlink_all_areas.area / (1000**2)
+land_all_areas_square_km = land_all.area / (1000**2)
+ocean_all_areas_square_km = ocean_all.area / (1000**2)
+earth_area = land_all_areas_square_km + ocean_all_areas_square_km
+
+print(starlink_all_areas_square_km)
+print(land_all_areas_square_km)
+print(EARTH_LAND_AREA_SQ_KM)
+print(earth_area)
+print(EARTH_SURFACE_AREA_SQ_KM)
