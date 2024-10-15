@@ -66,8 +66,11 @@ def download_current_tles_as_list(
         return None
 
 
-def download_current_tles_to_dataframe():
+def download_current_tles_to_dataframe(filter_dtc = True):
     """Downloads TLE data from the internet and returns them as a pandas DataFrame
+    
+    Args:
+        filter_dtc (bool, optional): Whether or not to filter out DTC satellites. defaults to True
 
     Returns:
         pandas.DataFrame | None: Returns the TLE data as pandas DataFrame object or None if the GET request failed.
@@ -94,7 +97,7 @@ def download_current_tles_to_dataframe():
         altitudes,
         not_implemented_errors,
         crashed_errors,
-    ) = tle_lines_to_lists(current_raw_tles)
+    ) = tle_lines_to_lists(current_raw_tles, filter_dtc=filter_dtc)
 
     data = {
         "Satellite": satellites,
