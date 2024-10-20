@@ -2,6 +2,7 @@
 from pathlib import Path
 from datetime import datetime, timezone
 from pyorbital.orbital import Orbital
+import requests
 
 
 # full package import statements
@@ -161,82 +162,91 @@ def tles_to_dataframe(
 
     return output
 
-# def tles_to_geodataframe(input_file_name: str, time: datetime,
-#                          buffer_points = True, angle = 45.0):
-#     """Take a downloaded text file of TLE data generated at a specific datetime and
-#     generate a pandas DataFrame from the data as longitude, latitude, altitude triplets
+def download_current_tles_as_list(
+    url="https://celestrak.org/NORAD/elements/supplemental/sup-gp.php?FILE=starlink&FORMAT=tle",
+):
+    """Downloads TLE data from the internet and returns them as a list
 
-#     Args:
-#         input_file_name (str): _description_
-#         time (datetime): _description_
-#         buffer_points (bool, optional): _description_. Defaults to True.
-#         angle (float, optional): _description_. Defaults to 45.0.
+    Args:
+        url (str, optional): The url to download TLE data from.
+            Defaults to "https://celestrak.org/NORAD/elements/supplemental/sup-gp.php?FILE=starlink&FORMAT=tle".
 
-#     Returns:
-#         _type_: _description_
-#     """
-#     # create the DataFrame object from the TLE file
-#     df = tles_to_dataframe(input_file_name=input_file_name,
-#                            time=time,
-#                            angle=angle)
+    Returns:
+        list | None: Returns the TLE data as a list of strings (each TLE is a set of 3 strings) or None if the GET request failed
+    """
+    try:
+        # Send a GET request to the URL
+        response = requests.get(
+            url
+        )  # may want to put a timeout argument here so that the program does not hang
+        response.raise_for_status()  # Raise an exception for HTTP errors
 
-#     # adding the Shapely object geometries from the data
-#     if buffer_points:
+        tle_split_text = response.text.split("\n")  # split the text into lines
+        raw_tle_lines = [
+            line.strip() for line in tle_split_text
+        ]  # strip the white space from each line
 
-#         # approach 3
-#         df["geometry"] = gpd.points_from_xy(x=df["Longitude"],
-#                                             y=df["Latitude"])
+        return raw_tle_lines[
+            :-1
+        ]  # return all the lines but the last one, which is a trailing newline
+
+    # error handling
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred: {e}")
+
+        return None
 
 
-#         # make the GeoDataFrame object and then do the buffering
-#         gdf = gpd.GeoDataFrame(df)
+def download_current_tles_to_dataframe(filter_dtc = True):
+    """Downloads TLE data from the internet and returns them as a pandas DataFrame
+    
+    Args:
+        filter_dtc (bool, optional): Whether or not to filter out DTC satellites. defaults to True
 
-#         # approach 4
-#         gdf["geometry"] = gdf["geometry"].buffer(distance=gdf["Radius"])
+    Returns:
+        pandas.DataFrame | None: Returns the TLE data as pandas DataFrame object or None if the GET request failed.
+            The columns of the DataFrame object are "Satellite" , "Longitude", "Latitude", and "Altitude".
+            The latitude and longitude are in decimal degrees, the altitude is in kilometers
+    """
 
-#         # # approach 3
-#         # gdf["geometry"] = gdf["geometry"].combine(df["Radius"],
-#         #                                           lambda x, y: x.buffer(y))
+    # Get the TLEs from Celestrak as a list if possible
+    try:
+        current_raw_tles = download_current_tles_as_list()
+    except requests.exceptions.RequestException:
+        print("An error was encountered when trying to download the TLEs")
+        return None
 
-#         # # create the point objects as a pandas Series object of Shapely Point objects
-#         # df["points"] = gpd.points_from_xy(x=df["Longitude"],
-#         #                                 y=df["Latitude"])
+    # Ensure each TLE has 3 lines and exit if there's not enough lines
+    if len(current_raw_tles) % 3 != 0:
+        print("The number of lines in the TLEs downloaded is unbalanced")
+        return None
 
-#         # # approach 1
-#         # # define an anonymous function for generating a buffer Shapely Polygon object
-#         # # from each point with a given buffer and use that within a pd.Combine call
-#         # df["geometry"] = df["points"].combine(df["Radius"],
-#         #                                       lambda x, y: x.buffer(y))
+    (
+        satellites,
+        longitudes,
+        latitudes,
+        altitudes,
+        not_implemented_errors,
+        crashed_errors,
+    ) = tle_lines_to_lists(current_raw_tles, filter_dtc=filter_dtc)
 
-#         # # approach 2
-#         # geometry_list = []
-#         # for i in range(len(df["points"])):
-#         #     geometry_list.append(sp.buffer(df["points"].iloc[i], df["Radius"].iloc[i]))
+    data = {
+        "Satellite": satellites,
+        "Longitude": longitudes,
+        "Latitude": latitudes,
+        "Altitude": altitudes,
+    }
 
-#         # df["geometry"] = geometry_list
-#     else:
-#         df["geometry"] = gpd.points_from_xy(x=df["Longitude"],
-#                                         y=df["Latitude"])
+    # If there were any satellites with NotImplementedError, print them
+    if not_implemented_errors:
+        print(
+            f"NotImplementedErrors encountered for satellites: {', '.join(not_implemented_errors)}"
+        )
 
-#         gdf = gpd.GeoDataFrame(df)
+    # If there were any satellites that are calculated to have crashed, print them
+    if crashed_errors:
+        print(
+            f"The following satellites were calculated to have crashed: {', '.join(crashed_errors)}"
+        )
 
-#     return gdf
-
-# simple impromptu test code
-# test = tles_to_dataframe("example_starlink_tle.txt", datetime.now(timezone.utc))
-# print(test.head())
-# test = tles_to_dataframe("starlink_tle_06OCT2024_21_22.txt", datetime.now(timezone.utc))
-# test = tles_to_geodataframe(input_file_name="starlink_tle_06OCT2024_21_22.txt",
-#                             time=datetime.now(timezone.utc))
-# print(test.head())
-# print(len(test))
-
-# EARTH_SURFACE_AREA_SQ_KM = 509600000
-# EARTH_LAND_AREA_SQ_KM = 148326000
-# print("Maximum Possible Fraction of Earth's Surface Area Covered by Starlink: ",
-#       sum(test["Area"])/(EARTH_SURFACE_AREA_SQ_KM))
-# print("Maximum Possible Fraction of Earth's Land Area Covered by Starlink: ",
-#       sum(test["Area"])/(EARTH_LAND_AREA_SQ_KM))
-# print("Median Area Covered by a Satellite: ", np.median(test["Area"]), "square kilometers")
-# print("Median Area Covered by a Satellite in terms of Earth Surface Area Coverage: ",
-#       (np.median(test["Area"])/EARTH_SURFACE_AREA_SQ_KM) * 100, "percent")
+    return pd.DataFrame(data)
