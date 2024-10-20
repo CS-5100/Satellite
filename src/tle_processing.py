@@ -92,7 +92,7 @@ def tle_lines_to_lists(lines: list, filter_dtc=False, time=datetime.now(timezone
 
 # Function to process TLEs into a DataFrame object
 def tles_to_dataframe(
-    input_file_name: str, time: datetime, calculate_radii_areas=False, angle=45.0
+    input_file_path: str, time: datetime, calculate_radii_areas=False, angle=45.0
 ):
     """Take a downloaded text file of TLE data generated at a specific datetime and
     generate a pandas DataFrame from the data as longitude, latitude, altitude triplets
@@ -106,9 +106,6 @@ def tles_to_dataframe(
     Returns:
         _type_: _description_
     """
-    # Define data directory and input file
-    dirpath = Path(__file__).parent.resolve() / ".." / "data" / "tle_text_files"
-    input_file_path = dirpath / input_file_name
 
     # Extract the TLEs from the file and strip whitespace
     with open(input_file_path, "r") as input_file:
