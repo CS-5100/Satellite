@@ -55,7 +55,7 @@ def convert_TLE_text_file_to_list(input_file_path: Path):
         input_file_path (Path): the path to the text file containing the raw TLE lines
 
     Returns:
-        list[str] | None: returns a list of raw TLE lines where each 3 lines defines a TLE coordinate of a satellite
+        list(str) | None: returns a list of raw TLE lines where each 3 lines defines a TLE coordinate of a satellite
     """
     # test if the file exists / file path is valid
     if not input_file_path.exists():
@@ -79,7 +79,7 @@ def tle_lines_to_lists(lines: list, filter_dtc=False, time=datetime.now(timezone
     to a set of identifiers, coordinates, and thrown errors
 
     Args:
-        lines (list[str]): The TLE data in the form of a list of strings
+        lines (list(str)): The TLE data in the form of a list of strings
         filter_dtc (bool, optional): Whether or not to exclude [DTC] labeled satellites.
             Defaults to False.
         time (datetime, optional): The time to be used for calculation of orbital parameters.
@@ -159,14 +159,14 @@ def tles_to_dataframe(
     with the data as longitude, latitude, altitude triplets along with radii and areas if requested.
 
     Args:
-        raw_tle_list (list): _description_
-        time (_type_, optional): _description_. Defaults to datetime.now(timezone.utc).
+        raw_tle_list (list(str)): _description_
+        time (datetime, optional): _description_. Defaults to datetime.now(timezone.utc).
         filter_dtc (bool, optional): _description_. Defaults to True.
         calculate_radii_areas (bool, optional): _description_. Defaults to False.
         angle (float, optional): _description_. Defaults to 45.0.
 
     Returns:
-        _type_: _description_
+        pandas.DataFrame: _description_
     """
     # Ensure each TLE has 3 lines
     if len(raw_tle_list) % 3 != 0:
@@ -216,6 +216,17 @@ def tles_to_dataframe(
 
     return output
 
+def tle_dataframe_to_geodataframe(tle_dataframe: pd.DataFrame, crs = "EPSG:4326"):
+    
+    # creating a geometry column for GeoDataFrame construction
+    tle_dataframe['geometry'] = gpd.points_from_xy(x=tle_dataframe["Longitude"],
+                                                   y=tle_dataframe["Latitude"])
+    
+    # construction of the GeoDataFrame from the data
+    tle_geodataframe = gpd.GeoDataFrame(data=tle_dataframe,
+                                        crs=crs)
+    
+    return tle_geodataframe
 
 # def download_current_tles_to_dataframe(filter_dtc = True):
 #     """Downloads TLE data from the internet and returns them as a pandas DataFrame

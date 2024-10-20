@@ -6,7 +6,7 @@ from pathlib import Path
 from datetime import datetime, timezone
 import numpy as np
 import geopandas as gpd
-import download_tle as dtl
+import tle_processing as tlp
 
 # defining a few constants
 EARTH_SURFACE_AREA_SQ_KM = 509600000
@@ -19,18 +19,19 @@ dirpath = Path(__file__).parent.resolve() / ".." / "data"
 current_time = datetime.now(timezone.utc)
 
 # creating a GeoDataFrame object
-starlink_current = dtl.download_current_tles_to_dataframe()
-starlink_gpd = gpd.GeoDataFrame(data=starlink_current,
-                                geometry=gpd.points_from_xy(x=starlink_current["Longitude"],
-                                                            y=starlink_current["Latitude"]),
-                                crs="EPSG:4326")
-starlink_gpd_points = starlink_gpd.copy(deep=True)
+starlink_current_tle_list = tlp.download_current_tles_as_list()
+starlink_current = tlp.tles_to_dataframe(raw_tle_list=starlink_current_tle_list)
+# print(starlink_current.head())
+starlink_gpd = tlp.tle_dataframe_to_geodataframe(starlink_current)
+# print(starlink_gpd.head())
 
 # importing map data
 land_filepath = dirpath / "map_data" / "ne_10m_land_scale_rank.zip"
 ocean_filepath = dirpath / "map_data" / "ne_10m_ocean_scale_rank.zip"
+urban_filepath = dirpath / "map_data" / "ne_10m_urban_areas.zip"
 land_map = gpd.read_file(filename=land_filepath)
 ocean_map = gpd.read_file(filename=ocean_filepath)
+urban_map = gpd.read_file(filename=urban_filepath)
 
 # defining a couple of epsg codes
 equal_distance_epsg = 4087
@@ -48,17 +49,16 @@ starlink_gpd['geometry'] = starlink_gpd['geometry'].buffer(12065)
 land_map = land_map.to_crs(epsg=equal_area_epsg)
 ocean_map = ocean_map.to_crs(epsg=equal_area_epsg)
 starlink_gpd = starlink_gpd.to_crs(epsg=equal_area_epsg)
-starlink_gpd_points = starlink_gpd_points.to_crs(epsg=equal_area_epsg)
 
 # filtering out any invalid geometries
 starlink_valid = starlink_gpd[starlink_gpd['geometry'].is_valid]
+# print(starlink_valid.head())
 
 # plotting the map
 fig, ax = plt.subplots()
 land_map.plot(ax=ax, color="#228B22")
 ocean_map.plot(ax=ax, color="#246BCE")
 starlink_valid.plot(ax=ax, color="#C51E3A")
-# starlink_gpd_points.plot(ax=ax, color="#C51E3A", markersize = 1)
 plt.show()
 
 # getting the total area covered by all satellites in square meters
