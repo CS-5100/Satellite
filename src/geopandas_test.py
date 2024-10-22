@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 import numpy as np
 import geopandas as gpd
 import tle_processing as tlp
+import geodataframe_manipulation as gmn
 
 # defining a few constants
 EARTH_SURFACE_AREA_SQ_KM = 509600000
@@ -61,6 +62,10 @@ ocean_map.plot(ax=ax, color="#246BCE")
 starlink_valid.plot(ax=ax, color="#C51E3A")
 plt.show()
 
+# testing initial area function
+starlink_land_intersection_area = gmn.satellite_and_map_data_intersection_area(satellite_data=starlink_valid,
+                                                                               map_data=land_map) / (1000**2)
+
 # getting the total area covered by all satellites in square meters
 starlink_all_areas = starlink_valid['geometry'].union_all()
 land_all = land_map['geometry'].union_all()
@@ -71,12 +76,11 @@ land_all_areas_square_km = land_all.area / (1000**2)
 ocean_all_areas_square_km = ocean_all.area / (1000**2)
 earth_area = land_all_areas_square_km + ocean_all_areas_square_km
 
-print(starlink_all_areas_square_km)
-print(land_all_areas_square_km)
-print(EARTH_LAND_AREA_SQ_KM)
-print(earth_area)
-print(EARTH_SURFACE_AREA_SQ_KM)
-
-# land area comparison doesn't make sense given we need intersection logic
-# can't do this for land area yet
-print(starlink_all_areas_square_km / earth_area) 
+print("Entirety of area covered by Starlink satellites (km^2): ", starlink_all_areas_square_km)
+print("Area covered by Starlink satellites that intersects with land (km^2): ", starlink_land_intersection_area)
+print("Total calculated land area (km^2): ", land_all_areas_square_km)
+print("Total land area from an external source (km^2): ", EARTH_LAND_AREA_SQ_KM)
+print("Total calculated earth area (km^2): ", earth_area)
+print("Total earth area from an external source (km^2): ", EARTH_SURFACE_AREA_SQ_KM)
+print("Fraction of possible Starlink coverage covering land", starlink_land_intersection_area / starlink_all_areas_square_km) 
+print("Fraction of land covered by Starlink", starlink_land_intersection_area / land_all_areas_square_km)

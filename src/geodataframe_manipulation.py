@@ -14,17 +14,17 @@ import shapely as sp
 # custom package import statements
 import tle_processing as tlp
 
-# function to add the area to each point, to be used in internal functions
-def geodataframe_add_buffer():
-    return None
 
-# function to get total area covered by satellites
-def geodataframe_get_total_area():
-    return None
-
-# function to get land area covered by satellites
-def geodataframe_get_land_area():
-    return None
+def satellite_and_map_data_intersection_area(satellite_data: gpd.GeoDataFrame, map_data: gpd.GeoDataFrame):
+    
+    # flatten the geometries contained in each GeoDataFrame into one multi-shape
+    satellite_union_shape = satellite_data['geometry'].union_all()
+    map_union_shape = map_data['geometry'].union_all()
+    
+    # get the intersection
+    satellite_map_intersection_shape = map_union_shape.intersection(satellite_union_shape)
+    
+    return satellite_map_intersection_shape.area
 
 # function to get population covered by satellites
 # (dependent on getting a reliable population density map)
