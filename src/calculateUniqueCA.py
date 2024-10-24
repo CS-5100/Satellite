@@ -10,7 +10,7 @@ from math import sqrt, acos, pi
 
 # Load the CSV file containing satellite information
 # Change this!!!!
-file_path = r'C:\Users\danny\PycharmProjects\Satellite\data\satellite_coverage.csv'
+file_path = r'C:\Users\chaud\Desktop\Satellite\data\satellite_coverage.csv'
 satellite_data = pd.read_csv(file_path)
 
 # Calculate the radius of coverage for each satellite based on its coverage area
