@@ -181,6 +181,9 @@ def calculate_group_union_area(group, satellite_data):
 # Earth's total surface area in km²
 earth_surface_area_km2 = 510072000
 
+
+### CAN WE COVERT THIS TO A FUNCTION - calculate_unique_coverage_area(satellite_data) ###
+
 # Calculate unique area for each connected component (group of satellites)
 total_unique_area = 0
 for group in connected_components:
