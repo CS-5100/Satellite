@@ -22,9 +22,13 @@ current_time = datetime.now(timezone.utc)
 # creating a GeoDataFrame object
 starlink_current_tle_list = tlp.download_current_tles_as_list()
 starlink_current = tlp.tles_to_dataframe(raw_tle_list=starlink_current_tle_list)
-# print(starlink_current.head())
+print(starlink_current.head())
 starlink_gpd = tlp.tle_dataframe_to_geodataframe(starlink_current)
-# print(starlink_gpd.head())
+print(starlink_gpd.head())
+
+print(gmn.geodataframe_total_unique_area(starlink_gpd))
+print(gmn.geodataframe_total_unique_area(starlink_gpd) / EARTH_SURFACE_AREA_SQ_KM)
+print(gmn.geodataframe_total_unique_area(starlink_gpd) / gmn.geodataframe_total_area(starlink_gpd))
 
 # importing map data
 land_filepath = dirpath / "map_data" / "ne_10m_land_scale_rank.zip"
