@@ -26,14 +26,17 @@ def satellite_and_map_data_intersection_area(satellite_data: gpd.GeoDataFrame, m
     
     return satellite_map_intersection_shape.area
 
-def geodataframe_total_unique_area(satellite_data: gpd.GeoDataFrame, angle = 45.0):
+def geodataframe_total_unique_area(satellite_data: gpd.GeoDataFrame, deep_copy = True, angle = 45.0):
+    
+    # seeing if operating on a temporary deep copy fixes the bug
+    satellites = satellite_data.copy(deep=deep_copy)
     
     # defining a couple of epsg codes
     equal_distance_epsg = 4087
     equal_area_epsg = 6933
     
     # re-project the data into a Cartesian coordinate system that preserves distances
-    satellite_distance = satellite_data.to_crs(epsg=equal_distance_epsg)
+    satellite_distance = satellites.to_crs(epsg=equal_distance_epsg)
     
     # generate radii from the input GeoDataFrame
     # selected Cartesian coordinate system is in meters,
