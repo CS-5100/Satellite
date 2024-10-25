@@ -26,7 +26,7 @@ def satellite_and_map_data_intersection_area(satellite_data: gpd.GeoDataFrame, m
     
     return satellite_map_intersection_shape.area
 
-def geodataframe_total_unique_area(satellite_data: gpd.GeoDataFrame, deep_copy = True, angle = 45.0):
+def geodataframe_total_unique_area(satellite_data: gpd.GeoDataFrame, deep_copy = True, coverage_angle = 45.0):
     
     # seeing if operating on a temporary deep copy fixes the bug
     satellites = satellite_data.copy(deep=deep_copy)
@@ -39,9 +39,18 @@ def geodataframe_total_unique_area(satellite_data: gpd.GeoDataFrame, deep_copy =
     satellite_distance = satellites.to_crs(epsg=equal_distance_epsg)
     
     # generate radii from the input GeoDataFrame
-    # selected Cartesian coordinate system is in meters,
-    # so altitude needs to be converted from kilometers to meters here
-    satellite_distance['Radius'] = (satellite_distance['Altitude'] * 1000) * np.tan((np.deg2rad(angle)) / 2.0)
+    
+    # angle for tangent is the other angle of the right triangle
+    # in a Euclidean triangle, the angles sum up to 180 degrees or pi radians
+    # angle for calculations = (pi radians - pi / 2 radians) - (coverage angle / 2)
+    # = pi / 2 radians - coverage angle in degrees / 2 converted to radians
+    tangent_angle = (np.pi / 2) - np.deg2rad(coverage_angle / 2.0)
+    tangent = np.tan(tangent_angle)
+    
+    # tangent = opposite / adjacent = altitude / radius => radius = altitude / tangent
+    # selected Cartesian coordinate system is in meters, so altitude needs to be converted
+    # from kilometers to meters here
+    satellite_distance['Radius'] = (satellite_distance['Altitude'] * 1000) / tangent
     
     # create internal function here for buffering the first argument with the second argument
     def buffer_point(point: sp.Point, radius: float):
