@@ -62,18 +62,28 @@ def perturb_positions(gdf, new_satellite_column, max_shift_km=500, random_state=
         max_shift_km (float): Maximum shift in kilometers for each satellite.
         random_state (int): Random state for reproducibility.
     """
+    # Define the max shift in meters
     max_shift_m = max_shift_km * 1000  # Convert km to meters
-    subset = gdf[gdf[new_satellite_column]].sample(frac=0.5, random_state=random_state)  # Perturb half of new satellites
 
+    # Select a subset of new satellites
+    subset = gdf[gdf[new_satellite_column]].sample(frac=0.5, random_state=random_state)
+
+    # Temporarily project to an equal-distance projection for accurate perturbation
+    subset = subset.to_crs(epsg=EQUAL_DISTANCE_EPSG)
+
+    # Apply random translations
     gdf.loc[subset.index, 'geometry'] = subset['geometry'].apply(
         lambda geom: translate(geom, xoff=np.random.uniform(-max_shift_m, max_shift_m),
                                       yoff=np.random.uniform(-max_shift_m, max_shift_m))
     )
 
+    # Project back to the equal-area projection
+    gdf = gdf.to_crs(epsg=EQUAL_AREA_EPSG)
+
 def calculate_land_coverage(gdf, land_map):
     # Apply a buffer around each satellite to simulate coverage
     buffered_gdf = gdf.copy()
-    buffered_gdf['geometry'] = buffered_gdf['geometry'].buffer(12065)  # Buffer of ~12.065 km radius
+    buffered_gdf['geometry'] = buffered_gdf['geometry'].buffer(121065)  # Buffer of ~121.065 km radius
 
     # Find intersection area between satellite coverage and land area
     intersections = buffered_gdf.overlay(land_map, how='intersection')
