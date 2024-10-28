@@ -7,6 +7,9 @@ from datetime import datetime
 import download_tle_to_df as dtd
 import calculateUniqueCA as cu  # Assuming this file contains helper functions for unique coverage area
 
+# Constants
+EARTH_RADIUS_KM = 6371  # Earth's radius in kilometers
+
 # Step 1: Download existing satellite TLE data
 def download_tles():
     # URL for the satellite positions (Starlink TLE data)
@@ -57,18 +60,32 @@ def generate_new_satellites(num_satellites=60):
     new_satellites_df['geometry'] = gpd.points_from_xy(new_satellites_df['Longitude'], new_satellites_df['Latitude'])
     return gpd.GeoDataFrame(new_satellites_df, crs="EPSG:4326")
 
-# Step 5: Objective function based on unique coverage area
+# Function to calculate the coverage area based on altitude
+def calculate_coverage_area(altitude_km):
+    """Calculate the coverage area of a satellite based on its altitude."""
+    return 2 * np.pi * EARTH_RADIUS_KM**2 * (1 - EARTH_RADIUS_KM / (EARTH_RADIUS_KM + altitude_km))
+
+# Step 5: Add the coverage area to the GeoDataFrame
+def add_coverage_area_to_gdf(geo_df):
+    """Add a coverage area column to the GeoDataFrame based on satellite altitude."""
+    geo_df['Coverage Area (km^2)'] = geo_df['Altitude'].apply(calculate_coverage_area)
+    return geo_df
+
+# Step 6: Objective function based on unique coverage area
 def objective_function(new_satellites_gdf, existing_satellites_gdf):
     """Calculate the total unique area coverage of the satellite network."""
     # Combine the existing and new satellites
     combined_gdf = pd.concat([new_satellites_gdf, existing_satellites_gdf])
+    
+    # Add coverage area to the combined GeoDataFrame
+    combined_gdf = add_coverage_area_to_gdf(combined_gdf)
     
     # Call the helper from calculateUniqueCA to calculate the coverage
     total_unique_coverage = cu.calculate_unique_coverage_area(combined_gdf)
     
     return total_unique_coverage
 
-# Step 6: Local search algorithm to optimize the placement of new satellites
+# Step 7: Local search algorithm to optimize the placement of new satellites
 def local_search(existing_satellites_gdf, iterations=100, step_size=0.01):
     # Generate initial random placement of 60 new satellites
     best_new_satellites = generate_new_satellites()
@@ -86,17 +103,19 @@ def local_search(existing_satellites_gdf, iterations=100, step_size=0.01):
 
     return best_new_satellites
 
-# Step 7: Prepare the mock TLE data and run the local search
+# Step 8: Prepare the mock TLE data and run the local search
 def prepare_data_with_pyorbital():
     tle_df = download_tles()  # Download existing TLE data
     existing_satellites_gdf = tle_dataframe_to_geodataframe(tle_df)  # Convert to GeoDataFrame
     return existing_satellites_gdf
 
-# Step 8: Run the local search to optimize new satellite placement
+# Step 9: Run the local search to optimize new satellite placement
 existing_satellites_gdf = prepare_data_with_pyorbital()  # Load existing satellite data
+print (existing_satellites_gdf)
 
 # Perform local search optimization to place 60 new satellites
 optimized_new_satellites = local_search(existing_satellites_gdf, iterations=10)
 
-# Step 9: Output the optimized satellite positions
+# Step 10: Output the optimized satellite positions
 print(optimized_new_satellites[['Satellite Name', 'Latitude', 'Longitude', 'Altitude']])
+

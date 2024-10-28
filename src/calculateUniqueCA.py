@@ -27,6 +27,10 @@ def calculate_unique_coverage_area(satellite_data):
 
     # Calculate the radius of coverage for each satellite based on its coverage area
     # Formula: Radius = sqrt(Coverage Area / pi)
+    satellite_data['Latitude'] = pd.to_numeric(satellite_data['Latitude'], errors='coerce')
+    satellite_data['Longitude'] = pd.to_numeric(satellite_data['Longitude'], errors='coerce')
+    satellite_data = satellite_data.dropna(subset=['Latitude', 'Longitude'])
+    
     satellite_data['Coverage Radius (km)'] = np.sqrt(satellite_data['Coverage Area (km^2)'] / np.pi)
 
     # ----------------------------------------------------------
@@ -73,8 +77,8 @@ def calculate_unique_coverage_area(satellite_data):
                 # Calculate the distance between the two satellites using the Haversine formula
                 distance = haversine(sat1['Latitude'], sat1['Longitude'], sat2['Latitude'], sat2['Longitude'])
                 if distance < (r1 + r2):  # Connect satellites only if they overlap
-                    satellite_graph[sat1['Satellite']].append(sat2['Satellite'])
-                    satellite_graph[sat2['Satellite']].append(sat1['Satellite'])
+                    satellite_graph[sat1['Satellite Name']].append(sat2['Satellite Name'])
+                    satellite_graph[sat2['Satellite Name']].append(sat1['Satellite Name'])
 
     # ----------------------------------------------------------
     # Step 4: Find connected components of overlapping satellites
@@ -132,7 +136,7 @@ def calculate_unique_coverage_area(satellite_data):
 
         # Step 1: Calculate the total area for all satellites in the group
         for satellite in group:
-            sat_data = satellite_data[satellite_data['Satellite'] == satellite].iloc[0]
+            sat_data = satellite_data[satellite_data['Satellite Name'] == satellite].iloc[0]
             r = sat_data['Coverage Radius (km)']
             area = calculate_circle_area(r)
             total_area += area
@@ -141,8 +145,8 @@ def calculate_unique_coverage_area(satellite_data):
         for i, sat1 in enumerate(group):
             for j, sat2 in enumerate(group):
                 if i < j:
-                    sat1_data = satellite_data[satellite_data['Satellite'] == sat1].iloc[0]
-                    sat2_data = satellite_data[satellite_data['Satellite'] == sat2].iloc[0]
+                    sat1_data = satellite_data[satellite_data['Satellite Name'] == sat1].iloc[0]
+                    sat2_data = satellite_data[satellite_data['Satellite Name'] == sat2].iloc[0]
 
                     # Only calculate overlap if this pair has not been processed
                     if (sat1, sat2) not in counted_pairs:
@@ -176,19 +180,20 @@ def calculate_unique_coverage_area(satellite_data):
         total_unique_area += group_unique_area
 
     # Calculate percentage of Earth's surface covered
-    coverage_percentage = (total_unique_area / earth_surface_area_km2) * 100
+    # coverage_percentage = (total_unique_area / earth_surface_area_km2) * 100
 
-    return total_unique_area, coverage_percentage
+    #return total_unique_area, coverage_percentage
+    return total_unique_area
 
 
 # ----------------------------------------------------------
 # Example Usage
 # ----------------------------------------------------------
 
-file_path = r'C:\Users\danny\PycharmProjects\Satellite\data\satellite_coverage.csv'
-satellite_data = pd.read_csv(file_path)
+#file_path = r'C:\Users\danny\PycharmProjects\Satellite\data\satellite_coverage.csv'
+#satellite_data = pd.read_csv(file_path)
 
-total_unique_area, coverage_percentage = calculate_unique_coverage_area(satellite_data)
+#total_unique_area, coverage_percentage = calculate_unique_coverage_area(satellite_data)
 
-print(f"Total Unique Coverage Area: {total_unique_area} km²")
-print(f"Percentage of Earth's Surface Covered: {coverage_percentage:.2f}%")
+#print(f"Total Unique Coverage Area: {total_unique_area} km²")
+#print(f"Percentage of Earth's Surface Covered: {coverage_percentage:.2f}%")
