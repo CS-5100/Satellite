@@ -5,7 +5,7 @@ from pyorbital import tlefile
 from pyorbital.orbital import Orbital
 from datetime import datetime
 import download_tle_to_df as dtd
-import calculateUniqueCA as cu  # Assuming this file contains helper functions for unique coverage area
+import calculateUniqueCA_NEW as cu  # Assuming this file contains helper functions for unique coverage area
 
 # Constants
 EARTH_RADIUS_KM = 6371  # Earth's radius in kilometers

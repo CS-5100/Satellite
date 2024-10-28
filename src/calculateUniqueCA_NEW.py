@@ -3,6 +3,9 @@ import numpy as np
 import networkx as nx
 from math import sqrt, pi
 from sklearn.neighbors import BallTree
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from shapely.geometry import Point
+from shapely.ops import unary_union
 
 def calculate_unique_coverage_area(satellite_data):
     """
@@ -51,23 +54,25 @@ def calculate_unique_coverage_area(satellite_data):
         c = 2 * atan2(sqrt(a), sqrt(1 - a))
         return r * c
 
-    # Find overlapping satellites using BallTree
-    for i, sat in satellite_data.iterrows():
+    # Function to process each satellite and find its overlapping neighbors
+    def process_satellite(i, sat):
         r1 = sat['Coverage Radius (km)'] / 6371.0  # Convert radius to radians (Earth's radius in km)
-        
-        # Query the BallTree for neighbors within the coverage radius
         neighbors = tree.query_radius([coords[i]], r=r1)[0]
-        
+        edges = []
         for neighbor_index in neighbors:
             if neighbor_index != i:  # Ignore self
                 sat2 = satellite_data.iloc[neighbor_index]
-                
-                # Calculate Haversine distance between the two satellites
                 distance = haversine(sat['Latitude'], sat['Longitude'], sat2['Latitude'], sat2['Longitude'])
-
-                # Only add an edge if the satellites actually overlap
                 if distance < (sat['Coverage Radius (km)'] + sat2['Coverage Radius (km)']):
-                    G.add_edge(sat['Satellite Name'], sat2['Satellite Name'])
+                    edges.append((sat['Satellite Name'], sat2['Satellite Name']))
+        return edges
+
+    # Use ThreadPoolExecutor to find overlapping satellites in parallel
+    with ThreadPoolExecutor() as executor:
+        futures = [executor.submit(process_satellite, i, sat) for i, sat in satellite_data.iterrows()]
+        for future in as_completed(futures):
+            edges = future.result()
+            G.add_edges_from(edges)
 
     print("Edges added. Finding connected components...")
 
@@ -76,20 +81,21 @@ def calculate_unique_coverage_area(satellite_data):
 
     print(f"Found {len(connected_components)} connected components. Calculating unique coverage area...")
 
-    # Function to calculate the area of a circle
-    def calculate_circle_area(radius):
-        return pi * radius ** 2
+    # Function to create a circle polygon for a satellite
+    def create_circle(lat, lon, radius):
+        return Point(lon, lat).buffer(radius / 6371.0)  # Radius in radians
 
     # Calculate the total unique coverage area
     total_unique_area = 0
     for idx, component in enumerate(connected_components):
         component_satellites = satellite_data[satellite_data['Satellite Name'].isin(component)]
-        total_area = sum(calculate_circle_area(sat['Coverage Radius (km)']) for _, sat in component_satellites.iterrows())
+        circles = [create_circle(sat['Latitude'], sat['Longitude'], sat['Coverage Radius (km)']) for _, sat in component_satellites.iterrows()]
+        union_area = unary_union(circles).area * (6371.0 ** 2)  # Convert area from radians^2 to km^2
         
         # Progress tracking for each component
         print(f"Processed component {idx+1}/{len(connected_components)}")
 
-        total_unique_area += total_area
+        total_unique_area += union_area
 
     print(f"Total unique coverage area: {total_unique_area} km²")
     

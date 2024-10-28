@@ -190,10 +190,10 @@ def calculate_unique_coverage_area(satellite_data):
 # Example Usage
 # ----------------------------------------------------------
 
-#file_path = r'C:\Users\danny\PycharmProjects\Satellite\data\satellite_coverage.csv'
-#satellite_data = pd.read_csv(file_path)
+file_path = r'C:\Users\chaud\Desktop\Satellite\data\satellite_coverage.csv'
+satellite_data = pd.read_csv(file_path)
 
-#total_unique_area, coverage_percentage = calculate_unique_coverage_area(satellite_data)
+total_unique_area, coverage_percentage = calculate_unique_coverage_area(satellite_data)
 
-#print(f"Total Unique Coverage Area: {total_unique_area} km²")
-#print(f"Percentage of Earth's Surface Covered: {coverage_percentage:.2f}%")
+print(f"Total Unique Coverage Area: {total_unique_area} km²")
+print(f"Percentage of Earth's Surface Covered: {coverage_percentage:.2f}%")
