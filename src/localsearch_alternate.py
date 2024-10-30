@@ -3,6 +3,7 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 import random
+import matplotlib.pyplot as plt
 import tle_processing as tlp
 from shapely.ops import unary_union
 from shapely.geometry import Point
@@ -14,6 +15,8 @@ EARTH_SURFACE_AREA_SQ_KM = 509600000
 EARTH_LAND_AREA_SQ_KM = 148326000
 EQUAL_DISTANCE_EPSG = 4087
 EQUAL_AREA_EPSG = 6933
+PLOT_INITIAL = True
+PLOT_FINAL = True
 
 def load_map_data():
     # Load land and ocean map data (adjust paths as necessary)
@@ -25,13 +28,15 @@ def load_map_data():
     ocean_map = gpd.read_file(filename=ocean_filepath).to_crs(epsg=EQUAL_AREA_EPSG)
     return land_map, ocean_map
 
-def load_existing_satellites():
+def load_existing_satellites(show_head=False):
     # Download and convert TLE data to GeoDataFrame for existing satellites
     starlink_current_tle_list = tlp.download_current_tles_as_list()
     starlink_current = tlp.tles_to_dataframe(raw_tle_list=starlink_current_tle_list)
     starlink_gdf = tlp.tle_dataframe_to_geodataframe(starlink_current)
     starlink_gdf = starlink_gdf.to_crs(epsg=EQUAL_AREA_EPSG)
-    print(starlink_gdf.head())
+    # we don't necessarily always want the head of the dataframe to print
+    if show_head:
+        print(starlink_gdf.head())
     return starlink_gdf
 
 def generate_new_satellites(num_satellites=60):
@@ -124,6 +129,21 @@ satellite_gdf = pd.concat([existing_satellites_gdf, new_satellites_gdf])
 
 # Load map data
 land_map, ocean_map = load_map_data()
+
+# plot current set of satellites in addition to the randomly initialized satellites,
+# in point form
+if PLOT_INITIAL:
+    initial_fig, initial_ax = plt.subplots()
+    print(existing_satellites_gdf.crs)
+    print(new_satellites_gdf.crs)
+    print(land_map.crs)
+    print(ocean_map.crs)
+    land_map.plot(ax=initial_ax, color="#228B22")
+    ocean_map.plot(ax=initial_ax, color="#246BCE")
+    existing_satellites_gdf.plot(ax=initial_ax, color="#C51E3A", markersize=1)
+    # the below color is apparently known as International Orange (Aerospace) and used in the aerospace industry
+    new_satellites_gdf.plot(ax=initial_ax, color="#FF4F00", markersize=1)
+    plt.show()
 
 # Run local search with perturbation targeted to new satellites
 optimized_gdf, optimized_land_coverage = local_search_optimization(
