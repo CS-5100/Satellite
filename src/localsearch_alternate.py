@@ -19,9 +19,9 @@ EQUAL_AREA_EPSG = 6933
 
 # Global Parameters
 PLOT = True
-BUFFER_RADIUS = 121065
+BUFFER_RADIUS = 12065
 PERTURB_DISTANCE_KM = 500
-BUFFER_PLOTS = True
+BUFFER_PLOTS = False
 
 def load_map_data():
     # Load land and ocean map data (adjust paths as necessary)
@@ -104,7 +104,6 @@ def generate_new_satellites(num_satellites=60, input_map = None, true_random = T
         # Construct the GeoDataFrame with geometry explicitly and re-project
         new_satellites_gdf = gpd.GeoDataFrame(new_satellite_data, geometry='geometry', crs="EPSG:4326").to_crs(epsg=EQUAL_AREA_EPSG)
         new_satellites_gdf['new_satellite'] = True  # Mark new satellites
-        print(new_satellites_gdf.head())
         return new_satellites_gdf
         
 
