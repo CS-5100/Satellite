@@ -15,8 +15,12 @@ EARTH_SURFACE_AREA_SQ_KM = 509600000
 EARTH_LAND_AREA_SQ_KM = 148326000
 EQUAL_DISTANCE_EPSG = 4087
 EQUAL_AREA_EPSG = 6933
-PLOT_INITIAL = True
-PLOT_FINAL = True
+
+# Global Parameters
+PLOT = True
+BUFFER_RADIUS = 121065
+PERTURB_DISTANCE_KM = 500
+BUFFER_PLOTS = True
 
 def load_map_data():
     # Load land and ocean map data (adjust paths as necessary)
@@ -85,13 +89,13 @@ def perturb_positions(gdf, new_satellite_column, max_shift_km=500, random_state=
     # Project back to the equal-area projection
     gdf = gdf.to_crs(epsg=EQUAL_AREA_EPSG)
 
-def calculate_land_coverage(gdf, land_map):
+def calculate_land_coverage(gdf, map, buffer_radius=121065):
     # Apply a buffer around each satellite to simulate coverage
     buffered_gdf = gdf.copy()
-    buffered_gdf['geometry'] = buffered_gdf['geometry'].buffer(121065)  # Buffer of ~121.065 km radius
+    buffered_gdf['geometry'] = buffered_gdf['geometry'].buffer(buffer_radius)  # Buffer of ~121.065 km radius
 
     # Find intersection area between satellite coverage and land area
-    intersections = buffered_gdf.overlay(land_map, how='intersection')
+    intersections = buffered_gdf.overlay(map, how='intersection')
     total_land_coverage = intersections['geometry'].area.sum() / (1000**2)  # Sum of non-overlapping areas in km²
     print(f"Current land coverage: {total_land_coverage:.2f} km²")  # Track coverage each iteration
     return total_land_coverage
@@ -123,33 +127,71 @@ def local_search_optimization(satellite_gdf, land_map, new_satellite_column, num
 existing_satellites_gdf = load_existing_satellites()
 existing_satellites_gdf['new_satellite'] = False  # Mark existing satellites
 
-# Generate new satellites and combine with existing ones
+# Generate new satellites, create a copy of them for plotting, and combine with existing ones
 new_satellites_gdf = generate_new_satellites(num_satellites=30)
+initial_satellites_gdf = new_satellites_gdf.copy()
 satellite_gdf = pd.concat([existing_satellites_gdf, new_satellites_gdf])
 
 # Load map data
 land_map, ocean_map = load_map_data()
 
-# plot current set of satellites in addition to the randomly initialized satellites,
-# in point form
-if PLOT_INITIAL:
-    initial_fig, initial_ax = plt.subplots()
-    print(existing_satellites_gdf.crs)
-    print(new_satellites_gdf.crs)
-    print(land_map.crs)
-    print(ocean_map.crs)
-    land_map.plot(ax=initial_ax, color="#228B22")
-    ocean_map.plot(ax=initial_ax, color="#246BCE")
-    existing_satellites_gdf.plot(ax=initial_ax, color="#C51E3A", markersize=1)
-    # the below color is apparently known as International Orange (Aerospace) and used in the aerospace industry
-    new_satellites_gdf.plot(ax=initial_ax, color="#FF4F00", markersize=1)
-    plt.show()
-
 # Run local search with perturbation targeted to new satellites
 optimized_gdf, optimized_land_coverage = local_search_optimization(
-    satellite_gdf, land_map, 'new_satellite', num_iterations=20
+    satellite_gdf, land_map, 'new_satellite', num_iterations=30
 )
 
+# extracting the new satellites from the GeoDataFrame for plotting purposes
+final_satellites_gdf = optimized_gdf[optimized_gdf['new_satellite']].copy()
+
 # Print out details of the newly generated satellites
-print("\nNew Satellites' Final Positions After Optimization:")
-print(optimized_gdf[optimized_gdf['new_satellite']][['Satellite Name', 'Latitude', 'Longitude', 'geometry']])
+# print("\nNew Satellites' Final Positions After Optimization:")
+# print(optimized_gdf[optimized_gdf['new_satellite']][['Satellite Name', 'Latitude', 'Longitude', 'geometry']])
+
+# plot current set of satellites in addition to the randomly initialized satellites,
+# in point form
+if PLOT:
+    
+    # create initial figure
+    initial_fig, initial_ax = plt.subplots(2, 1)
+    before_ax = initial_ax[0]
+    after_ax = initial_ax[1]
+    
+    # add map data to both plots
+    land_map.plot(ax=before_ax, color="#228B22")
+    ocean_map.plot(ax=before_ax, color="#246BCE")
+    land_map.plot(ax=after_ax, color="#228B22")
+    ocean_map.plot(ax=after_ax, color="#246BCE")
+    
+    # if a plot of buffered circles is requested
+    if BUFFER_PLOTS:
+        
+        # copy current GeoDataFrames to preserve their initial state
+        existing_satellites_gdf_buffered = existing_satellites_gdf.copy()
+        initial_satellites_gdf_buffered = initial_satellites_gdf.copy()
+        final_satellites_gdf_buffered = final_satellites_gdf.copy()
+        
+        # buffer the Point objects they create by the pre-specified buffer
+        existing_satellites_gdf_buffered['geometry'] = existing_satellites_gdf_buffered['geometry'].buffer(BUFFER_RADIUS)
+        initial_satellites_gdf_buffered['geometry'] = initial_satellites_gdf_buffered['geometry'].buffer(BUFFER_RADIUS)
+        final_satellites_gdf_buffered['geometry'] = final_satellites_gdf_buffered['geometry'].buffer(BUFFER_RADIUS)
+        
+        # add the initial satellites to the initial map
+        existing_satellites_gdf_buffered.plot(ax=before_ax, color="#0E0E10") # Jet Black
+        initial_satellites_gdf_buffered.plot(ax=before_ax, color="#FF4F00")
+        
+        # add the final satellites to the final map
+        existing_satellites_gdf_buffered.plot(ax=after_ax, color="#0E0E10") # Jet Black
+        final_satellites_gdf_buffered.plot(ax=after_ax, color="#FF4F00")
+        
+    # otherwise only add points and set their markersize to be 1 for easy visibility
+    else:
+        existing_satellites_gdf.plot(ax=before_ax, color="#0E0E10", markersize=1) # Jet Black
+        # the below color is apparently known as International Orange (Aerospace) and used in the aerospace industry
+        initial_satellites_gdf.plot(ax=before_ax, color="#FF4F00", markersize=1)
+        
+        existing_satellites_gdf.plot(ax=after_ax, color="#0E0E10", markersize=1) # Jet Black
+        # the below color is apparently known as International Orange (Aerospace) and used in the aerospace industry
+        final_satellites_gdf.plot(ax=after_ax, color="#FF4F00", markersize=1)
+        
+    # show the plot
+    plt.show()
