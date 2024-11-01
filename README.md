@@ -80,3 +80,17 @@ position2 = (540, 50, 20)   # Satellite 2's position
 # Calculate the distance between two satellites
 distance = calculate_distance(position1, position2)
 ```
+
+### Computer Unique Coverage Area
+
+To calculate the unique coverage area:
+
+```python
+from calculateUniqueCA_NEW import calculate_unique_coverage_area
+
+# Assuming 'df' is your DataFrame with columns: 'Satellite Name', 'Latitude', 'Longitude', and 'Coverage Area (km^2)'
+unique_coverage_area = calculate_unique_coverage_area(df)
+print(f"Total unique coverage area: {unique_coverage_area} km²")
+```
+
+This function uses BallTree spatial indexing to compute unique coverage areas by grouping overlapping satellites and calculating the union of their coverage areas.
