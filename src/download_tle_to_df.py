@@ -48,9 +48,9 @@ def download_tle_data_to_dataframe(url):
 # URL for the satellite positions (Starlink TLE data)
 url = "https://celestrak.org/NORAD/elements/supplemental/sup-gp.php?FILE=starlink&FORMAT=tle"
 
-# Call the function to download and convert the TLE data to a DataFrame
-df = download_tle_data_to_dataframe(url)
+# # Call the function to download and convert the TLE data to a DataFrame
+# df = download_tle_data_to_dataframe(url)
 
-# Display the DataFrame (if successfully created)
-if df is not None:
-    print(df.head())
+# # Display the DataFrame (if successfully created)
+# if df is not None:
+#     print(df.head())

@@ -33,9 +33,11 @@ To get started with this project, ensure you have Python installed, along with t
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/yourusername/satellite-coverage-analysis.git
-    cd satellite-coverage-analysis
+    cd /your/preferred/location/
+    git clone https://github.com/CS-5100/Satellite.git
+    cd Satellite/
     ```
+    > **Note**: GitHub has removed [password-based authentication](https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories#cloning-with-https-urls) when cloning with HTTPS URLs. Instead, use **GitHub CLI** or **personal access tokens (PAT)** for authentication when prompted.
 
 2. Install dependencies:
     ```bash
