@@ -107,6 +107,10 @@ def generate_new_satellites(num_satellites=60, input_map = None, true_random = T
             new_satellites_gdf['new_satellite'] = True  # Mark new satellites
             return new_satellites_gdf
         
+        else:
+            # TODO: implement sampling from the entire map as a flattened object
+            return None
+        
 
 def perturb_positions(gdf, new_satellite_column, max_shift_km=500, random_state=None):
     """
