@@ -44,7 +44,7 @@ def load_existing_satellites(show_head=False):
         print(starlink_gdf.head())
     return starlink_gdf
 
-def generate_new_satellites(num_satellites=60, input_map = None, true_random = True):
+def generate_new_satellites(num_satellites=60, input_map = None, true_random = True, sample_separate = True):
     
     # if the user wants to sample points from a predetermined map,
     # but no map is available to sample from, tell the user to provide one and fail
@@ -79,32 +79,33 @@ def generate_new_satellites(num_satellites=60, input_map = None, true_random = T
         return new_satellites_gdf
     
     else:
-        # sample from a random set of points drawn from each defined map geometry
+        if sample_separate:
+            # sample from a random set of points drawn from each defined map geometry
+                
+            # must have at least one point per geometry sampled,
+            # but can have more if we want a lot of initial satellites
+            num_points_per_polygon = int(np.ceil(float(num_satellites) / len(map)))
+                
+            # sample an appropriate number of points from each geometry
+            all_new_points = map.sample_points(num_points_per_polygon)
+                
+            # sample a number of satellites from all the generated satellite positions
+            new_points = all_new_points.sample(num_satellites)
+                
+            # once we have a set of generated points as a GeoSeries, we need to build the GeoDataFrame
+            new_coordinates = new_points.get_coordinates()
             
-        # must have at least one point per geometry sampled,
-        # but can have more if we want a lot of initial satellites
-        num_points_per_polygon = int(np.ceil(float(num_satellites) / len(map)))
+            # Generate satellite data with coordinates closer to land
+            new_satellite_data = {'Satellite Name': [f'NewSat{i+1}' for i in range(num_satellites)],
+                                    'Latitude': new_coordinates['y'],
+                                    'Longitude': new_coordinates['x'],
+                                    'geometry': new_points
+                                    }
             
-        # sample an appropriate number of points from each geometry
-        all_new_points = map.sample_points(num_points_per_polygon)
-            
-        # sample a number of satellites from all the generated satellite positions
-        new_points = all_new_points.sample(num_satellites)
-            
-        # once we have a set of generated points as a GeoSeries, we need to build the GeoDataFrame
-        new_coordinates = new_points.get_coordinates()
-        
-        # Generate satellite data with coordinates closer to land
-        new_satellite_data = {'Satellite Name': [f'NewSat{i+1}' for i in range(num_satellites)],
-                                'Latitude': new_coordinates['y'],
-                                'Longitude': new_coordinates['x'],
-                                'geometry': new_points
-                                }
-        
-        # Construct the GeoDataFrame with geometry explicitly and re-project
-        new_satellites_gdf = gpd.GeoDataFrame(new_satellite_data, geometry='geometry', crs="EPSG:4326").to_crs(epsg=EQUAL_AREA_EPSG)
-        new_satellites_gdf['new_satellite'] = True  # Mark new satellites
-        return new_satellites_gdf
+            # Construct the GeoDataFrame with geometry explicitly and re-project
+            new_satellites_gdf = gpd.GeoDataFrame(new_satellite_data, geometry='geometry', crs="EPSG:4326").to_crs(epsg=EQUAL_AREA_EPSG)
+            new_satellites_gdf['new_satellite'] = True  # Mark new satellites
+            return new_satellites_gdf
         
 
 def perturb_positions(gdf, new_satellite_column, max_shift_km=500, random_state=None):
@@ -189,9 +190,11 @@ optimized_gdf, optimized_land_coverage = local_search_optimization(
 # extracting the new satellites from the GeoDataFrame for plotting purposes
 final_satellites_gdf = optimized_gdf[optimized_gdf['new_satellite']].copy()
 
+print(optimized_gdf.crs)
+
 # Print out details of the newly generated satellites
-# print("\nNew Satellites' Final Positions After Optimization:")
-# print(optimized_gdf[optimized_gdf['new_satellite']][['Satellite Name', 'Latitude', 'Longitude', 'geometry']])
+print("\nNew Satellites' Final Positions After Optimization:")
+print(optimized_gdf[optimized_gdf['new_satellite']][['Satellite Name', 'Latitude', 'Longitude', 'geometry']])
 
 # plot current set of satellites in addition to the randomly initialized satellites,
 # in point form

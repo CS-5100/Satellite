@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 from datetime import datetime, timezone
 import numpy as np
+import pyproj
 import geopandas as gpd
 import tle_processing as tlp
 import geodataframe_manipulation as gmn
@@ -37,6 +38,13 @@ urban_filepath = dirpath / "map_data" / "ne_10m_urban_areas.zip"
 land_map = gpd.read_file(filename=land_filepath)
 ocean_map = gpd.read_file(filename=ocean_filepath)
 urban_map = gpd.read_file(filename=urban_filepath)
+
+land_map_dissolved = land_map.dissolve()
+land_map_dissolved_multipoint = land_map_dissolved.sample_points(1000)
+land_map_sampled_points = land_map_dissolved_multipoint.explode()
+print(land_map_sampled_points)
+print(land_map_sampled_points.get_coordinates())
+
 
 # defining a couple of epsg codes
 equal_distance_epsg = 4087
