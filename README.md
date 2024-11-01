@@ -9,7 +9,7 @@ This repository provides tools to calculate unique coverage areas for a constell
 - [Installation](#installation)
 - [Usage](#usage)
   - [Download and Process TLE Data](#download-and-process-tle-data)
-  - [Calculate Satellite Positions](#calculate-satellite-positions)
+  - [Calculate Inter-Satellite Distance](#calculate-inter-satellite-distance)
   - [Compute Unique Coverage Area](#compute-unique-coverage-area)
 - [Files](#files)
 - [Contributing](#contributing)
@@ -64,3 +64,19 @@ from tle_processing import download_tle_data_to_dataframe
 url = "https://celestrak.org/NORAD/elements/supplemental/sup-gp.php?FILE=starlink&FORMAT=tle"
 df = download_tle_data_to_dataframe(url)
 print(df.head())
+```
+
+### Calculate Inter-Satellite Distance
+
+Given two satellite positions, the calculate distance script calculates the Cartesian (Euclidean) distance between two satellites in Earth-Centered, Earth-Fixed (ECEF) coordinates.
+
+```python
+from satellite_distance import calculate_distance
+
+# Example positions in Latitude, Longitude, and Altitude format
+position1 = (550, 53, 0)    # Satellite 1's position
+position2 = (540, 50, 20)   # Satellite 2's position
+
+# Calculate the distance between two satellites
+distance = calculate_distance(position1, position2)
+```
