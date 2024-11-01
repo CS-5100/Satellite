@@ -3,6 +3,7 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 import random
+import pyproj
 import matplotlib.pyplot as plt
 import tle_processing as tlp
 from shapely.ops import unary_union
@@ -18,9 +19,9 @@ EQUAL_AREA_EPSG = 6933
 
 # Global Parameters
 PLOT = True
-BUFFER_RADIUS = 121065
-PERTURB_DISTANCE_KM = 500
-BUFFER_PLOTS = True
+BUFFER_RADIUS = 12065
+PERTURB_DISTANCE_KM = 500 # we may want to make this something that decays exponentially
+BUFFER_PLOTS = False
 
 def load_map_data():
     # Load land and ocean map data (adjust paths as necessary)
@@ -43,23 +44,68 @@ def load_existing_satellites(show_head=False):
         print(starlink_gdf.head())
     return starlink_gdf
 
-def generate_new_satellites(num_satellites=60):
-    # Bounds to center satellites near common land areas (adjust as needed)
-    lat_range = (-60, 70)  # Latitude range covering most inhabited regions
-    lon_range = (-180, 180)  # Longitude range covering major land areas
+def generate_new_satellites(num_satellites=60, input_map = None, true_random = True):
+    
+    # if the user wants to sample points from a predetermined map,
+    # but no map is available to sample from, tell the user to provide one and fail
+    if input_map is None and true_random is False:
+        print("you must specify a map GeoDataFrame to sample from.")
+        return None
+    
+    # copy the map so that it does not get mutated
+    map = input_map.copy()
+    
+    # to sample latitude and longitude, the map needs to be in a geodetic coordinate system
+    # so coerce the map into a worldwide geodetic coordinate reference system
+    if map is not None and map.crs != pyproj.CRS.from_epsg(4326):
+        map = map.to_crs(epsg=4326)
+    
+    if true_random:
+        # Bounds to center satellites near common land areas (adjust as needed)
+        lat_range = (-60, 70)  # Latitude range covering most inhabited regions
+        lon_range = (-180, 180)  # Longitude range covering major land areas
 
-    # Generate satellite data with coordinates closer to land
-    new_satellite_data = {
-        'Satellite Name': [f'NewSat{i+1}' for i in range(num_satellites)],
-        'Latitude': [random.uniform(*lat_range) for _ in range(num_satellites)],
-        'Longitude': [random.uniform(*lon_range) for _ in range(num_satellites)]
-    }
-    new_satellite_data['geometry'] = [Point(lon, lat) for lon, lat in zip(new_satellite_data['Longitude'], new_satellite_data['Latitude'])]
+        # Generate satellite data with coordinates closer to land
+        new_satellite_data = {
+            'Satellite Name': [f'NewSat{i+1}' for i in range(num_satellites)],
+            'Latitude': [random.uniform(*lat_range) for _ in range(num_satellites)],
+            'Longitude': [random.uniform(*lon_range) for _ in range(num_satellites)]
+        }
+        new_satellite_data['geometry'] = [Point(lon, lat) for lon, lat in zip(new_satellite_data['Longitude'], new_satellite_data['Latitude'])]
 
-    # Construct the GeoDataFrame with geometry explicitly and re-project
-    new_satellites_gdf = gpd.GeoDataFrame(new_satellite_data, geometry='geometry', crs="EPSG:4326").to_crs(epsg=EQUAL_AREA_EPSG)
-    new_satellites_gdf['new_satellite'] = True  # Mark new satellites
-    return new_satellites_gdf
+        # Construct the GeoDataFrame with geometry explicitly and re-project
+        new_satellites_gdf = gpd.GeoDataFrame(new_satellite_data, geometry='geometry', crs="EPSG:4326").to_crs(epsg=EQUAL_AREA_EPSG)
+        new_satellites_gdf['new_satellite'] = True  # Mark new satellites
+        return new_satellites_gdf
+    
+    else:
+        # sample from a random set of points drawn from each defined map geometry
+            
+        # must have at least one point per geometry sampled,
+        # but can have more if we want a lot of initial satellites
+        num_points_per_polygon = int(np.ceil(float(num_satellites) / len(map)))
+            
+        # sample an appropriate number of points from each geometry
+        all_new_points = map.sample_points(num_points_per_polygon)
+            
+        # sample a number of satellites from all the generated satellite positions
+        new_points = all_new_points.sample(num_satellites)
+            
+        # once we have a set of generated points as a GeoSeries, we need to build the GeoDataFrame
+        new_coordinates = new_points.get_coordinates()
+        
+        # Generate satellite data with coordinates closer to land
+        new_satellite_data = {'Satellite Name': [f'NewSat{i+1}' for i in range(num_satellites)],
+                                'Latitude': new_coordinates['y'],
+                                'Longitude': new_coordinates['x'],
+                                'geometry': new_points
+                                }
+        
+        # Construct the GeoDataFrame with geometry explicitly and re-project
+        new_satellites_gdf = gpd.GeoDataFrame(new_satellite_data, geometry='geometry', crs="EPSG:4326").to_crs(epsg=EQUAL_AREA_EPSG)
+        new_satellites_gdf['new_satellite'] = True  # Mark new satellites
+        return new_satellites_gdf
+        
 
 def perturb_positions(gdf, new_satellite_column, max_shift_km=500, random_state=None):
     """
@@ -89,7 +135,7 @@ def perturb_positions(gdf, new_satellite_column, max_shift_km=500, random_state=
     # Project back to the equal-area projection
     gdf = gdf.to_crs(epsg=EQUAL_AREA_EPSG)
 
-def calculate_land_coverage(gdf, map, buffer_radius=121065):
+def calculate_land_coverage(gdf, map, buffer_radius=BUFFER_RADIUS):
     # Apply a buffer around each satellite to simulate coverage
     buffered_gdf = gdf.copy()
     buffered_gdf['geometry'] = buffered_gdf['geometry'].buffer(buffer_radius)  # Buffer of ~121.065 km radius
@@ -100,9 +146,9 @@ def calculate_land_coverage(gdf, map, buffer_radius=121065):
     print(f"Current land coverage: {total_land_coverage:.2f} km²")  # Track coverage each iteration
     return total_land_coverage
 
-def local_search_optimization(satellite_gdf, land_map, new_satellite_column, num_iterations=10):
+def local_search_optimization(satellite_gdf, land_map, new_satellite_column, buffer_radius = BUFFER_RADIUS, num_iterations=10):
     best_gdf = satellite_gdf.copy()
-    best_land_coverage = calculate_land_coverage(best_gdf, land_map)
+    best_land_coverage = calculate_land_coverage(best_gdf, land_map, buffer_radius=buffer_radius)
 
     for iteration in range(num_iterations):
         print(f"Iteration {iteration + 1}/{num_iterations}")
@@ -112,7 +158,7 @@ def local_search_optimization(satellite_gdf, land_map, new_satellite_column, num
         perturb_positions(new_gdf, new_satellite_column, random_state=randint(0, 10000))
         
         # Calculate new land coverage area
-        new_land_coverage = calculate_land_coverage(new_gdf, land_map)
+        new_land_coverage = calculate_land_coverage(new_gdf, land_map, buffer_radius=buffer_radius)
         
         if new_land_coverage > best_land_coverage:
             print(f"Improvement found: {new_land_coverage:.2f} km² vs {best_land_coverage:.2f} km²")
@@ -127,13 +173,13 @@ def local_search_optimization(satellite_gdf, land_map, new_satellite_column, num
 existing_satellites_gdf = load_existing_satellites()
 existing_satellites_gdf['new_satellite'] = False  # Mark existing satellites
 
-# Generate new satellites, create a copy of them for plotting, and combine with existing ones
-new_satellites_gdf = generate_new_satellites(num_satellites=30)
-initial_satellites_gdf = new_satellites_gdf.copy()
-satellite_gdf = pd.concat([existing_satellites_gdf, new_satellites_gdf])
-
 # Load map data
 land_map, ocean_map = load_map_data()
+
+# Generate new satellites, create a copy of them for plotting, and combine with existing ones
+new_satellites_gdf = generate_new_satellites(num_satellites=30, input_map=land_map, true_random=False)
+initial_satellites_gdf = new_satellites_gdf.copy()
+satellite_gdf = pd.concat([existing_satellites_gdf, new_satellites_gdf])
 
 # Run local search with perturbation targeted to new satellites
 optimized_gdf, optimized_land_coverage = local_search_optimization(
