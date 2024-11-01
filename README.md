@@ -1,6 +1,6 @@
 # Satellite Coverage Analysis
 
-This repository provides tools to calculate unique coverage areas for a constellation of satellites. The project uses satellite Two-Line Element (TLE) data, geometric and geographic operations, and efficient spatial data processing methods to compute total and unique coverage areas. It leverages libraries like `pandas`, `geopandas`, `shapely`, and `pyorbital` for streamlined satellite and geographic data manipulation.
+This repository provides tools to determine optimal satellite positions for achieving maximum area coverage on Earth. By using Two-Line Element (TLE) data, geographic transformations, and spatial data processing, this project analyzes the unique coverage area of satellite constellations. It provides functions to calculate each satellite’s position in 3D Earth-Centered coordinates and to compute coverage overlap, enabling analysis and optimization of satellite configurations for efficient global coverage.
 
 ## Table of Contents
 
@@ -19,7 +19,7 @@ This repository provides tools to calculate unique coverage areas for a constell
 
 ## Getting Started
 
-To get started with this project, ensure you have Python installed, along with the required packages outlined below. The repository is set up to handle TLE data, calculate satellite coverage, and assess spatial overlap.
+To get started with this project, ensure you have Python installed, along with the required packages outlined in the `requirements.txt` file. The repository is set up to handle TLE data, calculate satellite coverage, and assess spatial overlap.
 
 ## Features
 
