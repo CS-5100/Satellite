@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 from datetime import datetime, timezone
 import numpy as np
-import pyproj
+from pyproj import CRS, Transformer
 import geopandas as gpd
 import tle_processing as tlp
 import geodataframe_manipulation as gmn
@@ -42,8 +42,16 @@ urban_map = gpd.read_file(filename=urban_filepath)
 land_map_dissolved = land_map.dissolve()
 land_map_dissolved_multipoint = land_map_dissolved.sample_points(1000)
 land_map_sampled_points = land_map_dissolved_multipoint.explode()
-print(land_map_sampled_points)
-print(land_map_sampled_points.get_coordinates())
+land_map_sampled_point_coordinates = land_map_sampled_points.get_coordinates()
+
+new_satellite_data = {'Satellite Name': [f'NewSat{i+1}' for i in range(1000)],
+                                    'Latitude': land_map_sampled_point_coordinates.y,
+                                    'Longitude': land_map_sampled_point_coordinates.x,
+                                    'geometry': land_map_sampled_points
+                                    }
+
+new_satellites_gdf = gpd.GeoDataFrame(new_satellite_data, crs="EPSG:4326")
+print(new_satellites_gdf.head())
 
 
 # defining a couple of epsg codes
