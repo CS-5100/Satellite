@@ -6,6 +6,7 @@ import random
 import pyproj
 import matplotlib.pyplot as plt
 import tle_processing as tlp
+from shapely import Point
 from shapely.ops import unary_union
 from shapely.geometry import Point
 from shapely.affinity import translate
@@ -110,7 +111,40 @@ def generate_new_satellites(num_satellites=60, input_map = None, true_random = T
         else:
             # TODO: implement sampling from the entire map as a flattened object
             return None
+    
+# create function to wrap a point around the globe if necessary
+def wrap(point: Point, EPSG):
         
+    # get the projected bounds of the CRS in cartesian coordinates
+    eq_dist_crs = pyproj.CRS.from_epsg(EPSG)
+    transformer = pyproj.Transformer.from_crs(eq_dist_crs.geodetic_crs, eq_dist_crs, always_xy=True)
+    min_lon, min_lat, max_lon, max_lat = transformer.transform_bounds(*eq_dist_crs.area_of_use.bounds)
+    
+    # get the total length of the map along each direction
+    map_length_x = max_lon - min_lon
+    map_length_y = max_lat - min_lat
+    
+    # if the point is off the left edge of the earth,
+    # shift the coordinate to the right by a map length
+    if point.x < min_lon:
+        point = translate(point, xoff=map_length_x)
+    
+    # if the point is off the right edge of the earth,
+    # shift the coordinate to the left by a map length  
+    if point.x > max_lon:
+        point = translate(point, xoff=-map_length_x)
+        
+    # if the point is off the bottom edge of the earth,
+    # shift the coordinate upwards by a map length 
+    if point.y < min_lat:
+        point = translate(point, yoff=map_length_y)
+        
+    # if the point is off the top edge of the earth
+    # shift the coordinate downwards by a map length
+    if point.y > max_lat:
+        point = translate(point, yoff=-map_length_y)
+        
+    return point
 
 def perturb_positions(gdf, new_satellite_column, max_shift_km=500, random_state=None):
     """
@@ -129,6 +163,7 @@ def perturb_positions(gdf, new_satellite_column, max_shift_km=500, random_state=
     subset = gdf[gdf[new_satellite_column]].sample(frac=0.5, random_state=random_state)
 
     # Temporarily project to an equal-distance projection for accurate perturbation
+    # and get the projected bounds
     subset = subset.to_crs(epsg=EQUAL_DISTANCE_EPSG)
 
     # Apply random translations
@@ -136,7 +171,12 @@ def perturb_positions(gdf, new_satellite_column, max_shift_km=500, random_state=
         lambda geom: translate(geom, xoff=np.random.uniform(-max_shift_m, max_shift_m),
                                       yoff=np.random.uniform(-max_shift_m, max_shift_m))
     )
-
+    
+    # Wrap the points around the earth to make sure they stay on the globe
+    gdf.loc[subset.index, 'geometry'] = subset['geometry'].apply(
+        lambda geom: wrap(geom, EPSG=EQUAL_DISTANCE_EPSG)
+    )
+    
     # Project back to the equal-area projection
     gdf = gdf.to_crs(epsg=EQUAL_AREA_EPSG)
 
