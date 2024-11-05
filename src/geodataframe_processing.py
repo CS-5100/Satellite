@@ -1,11 +1,10 @@
 from pathlib import Path
 import geopandas as gpd
 import numpy as np
-import random
 import pyproj
-import tle_processing as tlp
 from shapely import Point
 from shapely.affinity import translate
+import tle_processing as tlp
 
 
 def load_map_data(map_file_name: str, EPSG: int | str):
@@ -41,6 +40,7 @@ def generate_new_satellites(
     input_map=None,
     true_random=True,
     sample_separate=True,
+    random_seed=None
 ):
     # if the user wants to sample points from a predetermined map,
     # but no map is available to sample from, tell the user to provide one and fail
@@ -57,6 +57,10 @@ def generate_new_satellites(
         map = map.to_crs(epsg=4326)
 
     if true_random:
+        
+        # create random number generator
+        rng = np.random.default_rng(seed=random_seed)
+        
         # Bounds to center satellites near common land areas (adjust as needed)
         lat_range = (-60, 70)  # Latitude range covering most inhabited regions
         lon_range = (-180, 180)  # Longitude range covering major land areas
@@ -64,8 +68,8 @@ def generate_new_satellites(
         # Generate satellite data with coordinates closer to land
         new_satellite_data = {
             "Satellite Name": [f"NewSat{i+1}" for i in range(num_satellites)],
-            "Latitude": [random.uniform(*lat_range) for _ in range(num_satellites)],
-            "Longitude": [random.uniform(*lon_range) for _ in range(num_satellites)],
+            "Latitude": [rng.uniform(*lat_range) for _ in range(num_satellites)],
+            "Longitude": [rng.uniform(*lon_range) for _ in range(num_satellites)],
         }
         new_satellite_data["geometry"] = [
             Point(lon, lat)
@@ -201,6 +205,10 @@ def perturb_positions(
         max_shift_km (float): Maximum shift in kilometers for each satellite.
         random_state (int): Random state for reproducibility.
     """
+    
+    # create random number generator
+    rng = np.random.default_rng(seed=random_state)
+    
     # Define the max shift in meters
     max_shift_m = max_shift_km * 1000  # Convert km to meters
 
@@ -215,8 +223,8 @@ def perturb_positions(
     gdf.loc[subset.index, "geometry"] = subset["geometry"].apply(
         lambda geom: translate(
             geom,
-            xoff=np.random.uniform(-max_shift_m, max_shift_m),
-            yoff=np.random.uniform(-max_shift_m, max_shift_m),
+            xoff=rng.uniform(-max_shift_m, max_shift_m),
+            yoff=rng.uniform(-max_shift_m, max_shift_m),
         )
     )
 
@@ -229,19 +237,26 @@ def perturb_positions(
     gdf = gdf.to_crs(epsg=eq_area_epsg)
 
 
-def calculate_land_coverage(gdf, map, buffer_radius):
-    # Apply a buffer around each satellite to simulate coverage
+def calculate_land_coverage(gdf, map, buffer_radius, print_result=False):
+    
+    # copy the initial array to prevent mutation
     buffered_gdf = gdf.copy()
+    
+    # filter out any points that have NaN coordinates, as they should not contribute
+    buffered_gdf = buffered_gdf[buffered_gdf['geometry'].is_valid]
+    
+    # Apply a buffer around each satellite to simulate coverage
     buffered_gdf["geometry"] = buffered_gdf["geometry"].buffer(
         buffer_radius
-    )  # Buffer of ~121.065 km radius
+    )
 
     # Find intersection area between satellite coverage and land area
     intersections = buffered_gdf.overlay(map, how="intersection")
     total_land_coverage = intersections["geometry"].area.sum() / (
         1000**2
     )  # Sum of non-overlapping areas in km²
-    print(
-        f"Current land coverage: {total_land_coverage:.2f} km²"
-    )  # Track coverage each iteration
+    if print_result:
+        print(
+            f"Current land coverage: {total_land_coverage:.2f} km²"
+        )  # Track coverage each iteration
     return total_land_coverage
