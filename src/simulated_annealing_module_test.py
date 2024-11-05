@@ -3,9 +3,6 @@ import time
 import math
 import random
 from random import randint
-import matplotlib.pyplot as plt
-
-from pathlib import Path
 import pandas as pd
 
 import geodataframe_processing as gdfp

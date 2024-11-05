@@ -1,6 +1,5 @@
 from random import randint
 import pandas as pd
-import matplotlib.pyplot as plt
 
 import geodataframe_processing as gdfp
 from custom_plotting import plot_initial_final_satellites
