@@ -1,4 +1,5 @@
 from pathlib import Path
+from datetime import datetime, timezone
 import geopandas as gpd
 import numpy as np
 import pyproj
@@ -26,6 +27,21 @@ def load_existing_satellites(EPSG: int | str, show_head=False):
     # Download and convert TLE data to GeoDataFrame for existing satellites
     starlink_current_tle_list = tlp.download_current_tles_as_list()
     starlink_current = tlp.tles_to_dataframe(raw_tle_list=starlink_current_tle_list)
+    starlink_gdf = tlp.tle_dataframe_to_geodataframe(starlink_current)
+    starlink_gdf = starlink_gdf.to_crs(epsg=EPSG)
+    # we don't necessarily always want the head of the dataframe to print
+    if show_head:
+        print(starlink_gdf.head())
+    return starlink_gdf
+
+def load_satellites_from_file(EPSG: int | str, input_filename: str, time = datetime.now(tz=timezone.utc), show_head=False):
+    # current schema is designed so that TLE text files are in this particular directory
+    filepath = (
+        Path(__file__).parent.resolve() / ".." / "data" / "map_data" / input_filename
+    )
+    # Download and convert TLE data to GeoDataFrame for existing satellites
+    starlink_tle_list = tlp.convert_TLE_text_file_to_list(input_file_path=filepath)
+    starlink_current = tlp.tles_to_dataframe(raw_tle_list=starlink_tle_list)
     starlink_gdf = tlp.tle_dataframe_to_geodataframe(starlink_current)
     starlink_gdf = starlink_gdf.to_crs(epsg=EPSG)
     # we don't necessarily always want the head of the dataframe to print
