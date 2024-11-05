@@ -8,9 +8,7 @@ import requests
 # full package import statements
 import pandas as pd
 import numpy as np
-import pyproj as pyj
 import geopandas as gpd
-import shapely as sp
 
 def download_current_tles_as_list(
     url="https://celestrak.org/NORAD/elements/supplemental/sup-gp.php?FILE=starlink&FORMAT=tle",
@@ -23,7 +21,7 @@ def download_current_tles_as_list(
             Defaults to "https://celestrak.org/NORAD/elements/supplemental/sup-gp.php?FILE=starlink&FORMAT=tle".
 
     Returns:
-        list[str] | None: Returns the TLE data as a list of strings (each TLE is a set of 3 strings) or None if the GET request failed
+        list(str) | None: Returns the TLE data as a list of strings (each TLE is a set of 3 strings) or None if the GET request failed
     """
     try:
         # Send a GET request to the URL
