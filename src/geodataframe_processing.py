@@ -5,7 +5,6 @@ import random
 import pyproj
 import tle_processing as tlp
 from shapely import Point
-from shapely.geometry import Point
 from shapely.affinity import translate
 
 
@@ -19,9 +18,9 @@ def load_map_data(map_file_name: str, EPSG: int | str):
 
 
 def load_land_ocean_data(EPSG: int | str):
-    land_map = load_map_data("ne_10m_land_scale_rank.zip", EPSG=EPSG)
-    ocean_map = load_map_data("ne_10m_ocean_scale_rank.zip", EPSG=EPSG)
-    return land_map, ocean_map
+    land = load_map_data("ne_10m_land_scale_rank.zip", EPSG=EPSG)
+    ocean = load_map_data("ne_10m_ocean_scale_rank.zip", EPSG=EPSG)
+    return land, ocean
 
 
 def load_existing_satellites(EPSG: int | str, show_head=False):
