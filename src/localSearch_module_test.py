@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 import geodataframe_processing as gdfp
+from custom_plotting import plot_initial_final_satellites
 
 # Constants
 EARTH_SURFACE_AREA_SQ_KM = 509600000
@@ -11,13 +12,10 @@ EQUAL_DISTANCE_EPSG = 4087
 EQUAL_AREA_EPSG = 6933
 
 # Global Parameters
-PLOT = True
 BUFFER_RADIUS = 12065
 PERTURB_DISTANCE_KM = (
     500  # we may want to make this something that decays exponentially
 )
-BUFFER_PLOTS = False
-
 
 def local_search_optimization(
     satellite_gdf,
@@ -105,63 +103,8 @@ print(
     ]
 )
 
-# plot current set of satellites in addition to the randomly initialized satellites,
-# in point form
-if PLOT:
-
-    # create initial figure
-    initial_fig, initial_ax = plt.subplots(2, 1)
-    before_ax = initial_ax[0]
-    after_ax = initial_ax[1]
-
-    # add map data to both plots
-    land_map.plot(ax=before_ax, color="#228B22")
-    ocean_map.plot(ax=before_ax, color="#246BCE")
-    land_map.plot(ax=after_ax, color="#228B22")
-    ocean_map.plot(ax=after_ax, color="#246BCE")
-
-    # if a plot of buffered circles is requested
-    if BUFFER_PLOTS:
-
-        # copy current GeoDataFrames to preserve their initial state
-        existing_satellites_gdf_buffered = existing_satellites_gdf.copy()
-        initial_satellites_gdf_buffered = initial_satellites_gdf.copy()
-        final_satellites_gdf_buffered = final_satellites_gdf.copy()
-
-        # buffer the Point objects they create by the pre-specified buffer
-        existing_satellites_gdf_buffered["geometry"] = existing_satellites_gdf_buffered[
-            "geometry"
-        ].buffer(BUFFER_RADIUS)
-        initial_satellites_gdf_buffered["geometry"] = initial_satellites_gdf_buffered[
-            "geometry"
-        ].buffer(BUFFER_RADIUS)
-        final_satellites_gdf_buffered["geometry"] = final_satellites_gdf_buffered[
-            "geometry"
-        ].buffer(BUFFER_RADIUS)
-
-        # add the initial satellites to the initial map
-        existing_satellites_gdf_buffered.plot(
-            ax=before_ax, color="#0E0E10"
-        )  # Jet Black
-        initial_satellites_gdf_buffered.plot(ax=before_ax, color="#FF4F00")
-
-        # add the final satellites to the final map
-        existing_satellites_gdf_buffered.plot(ax=after_ax, color="#0E0E10")  # Jet Black
-        final_satellites_gdf_buffered.plot(ax=after_ax, color="#FF4F00")
-
-    # otherwise only add points and set their markersize to be 1 for easy visibility
-    else:
-        existing_satellites_gdf.plot(
-            ax=before_ax, color="#0E0E10", markersize=1
-        )  # Jet Black
-        # the below color is apparently known as International Orange (Aerospace) and used in the aerospace industry
-        initial_satellites_gdf.plot(ax=before_ax, color="#FF4F00", markersize=1)
-
-        existing_satellites_gdf.plot(
-            ax=after_ax, color="#0E0E10", markersize=1
-        )  # Jet Black
-        # the below color is apparently known as International Orange (Aerospace) and used in the aerospace industry
-        final_satellites_gdf.plot(ax=after_ax, color="#FF4F00", markersize=1)
-
-    # show the plot
-    plt.show()
+plot_initial_final_satellites(existing_satellites=existing_satellites_gdf,
+                              initial_positions=initial_satellites_gdf,
+                              final_positions=final_satellites_gdf,
+                              land=land_map,
+                              ocean=ocean_map)

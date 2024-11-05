@@ -9,6 +9,7 @@ from pathlib import Path
 import pandas as pd
 
 import geodataframe_processing as gdfp
+from custom_plotting import plot_initial_final_satellites
 
 # Constants
 EARTH_SURFACE_AREA_SQ_KM = 509600000
@@ -17,10 +18,8 @@ EQUAL_DISTANCE_EPSG = 4087
 EQUAL_AREA_EPSG = 6933
 
 # Global Parameters
-PLOT = True
 BUFFER_RADIUS = 121065
 PERTURB_DISTANCE_KM = 500
-BUFFER_PLOTS = True
 
 # Load existing satellite data from TLEs and flag new satellites
 existing_satellites_gdf = gdfp.load_existing_satellites(EPSG=EQUAL_AREA_EPSG)
@@ -119,38 +118,48 @@ optimized_gdf, optimized_land_coverage, iteration_times, best_land_coverage_list
     satellite_gdf, land_map, 'new_satellite', BUFFER_RADIUS, num_iterations=50
 )
 
-# Plot best land coverage over iterations
-plt.figure(figsize=(10, 6))
-plt.plot(range(1, len(best_land_coverage_list) + 1), best_land_coverage_list, marker='o', color='g')
-plt.xlabel("Iteration Number")
-plt.ylabel("Best Land Coverage (km²)")
-plt.title("Best Land Coverage Over Iterations with Simulated Annealing")
-plt.grid(True)
-plt.show()
+# extracting the new satellites from the GeoDataFrame for plotting purposes
+final_satellites_gdf = optimized_gdf[optimized_gdf["new_satellite"]].copy()
 
-# Plot number of iterations vs time
-plt.figure(figsize=(10, 6))
-plt.plot(range(1, len(iteration_times) + 1), iteration_times, marker='o', color='b')
-plt.xlabel("Iteration Number")
-plt.ylabel("Time (seconds)")
-plt.title("Iteration vs. Time Taken for Local Search Optimization")
-plt.grid(True)
-plt.show()
+# # Plot best land coverage over iterations
+# plt.figure(figsize=(10, 6))
+# plt.plot(range(1, len(best_land_coverage_list) + 1), best_land_coverage_list, marker='o', color='g')
+# plt.xlabel("Iteration Number")
+# plt.ylabel("Best Land Coverage (km²)")
+# plt.title("Best Land Coverage Over Iterations with Simulated Annealing")
+# plt.grid(True)
+# plt.show()
 
-# Define the output file path
-output_filepath = Path.cwd() / "data/optimized_satellite_positions.txt"
+# # Plot number of iterations vs time
+# plt.figure(figsize=(10, 6))
+# plt.plot(range(1, len(iteration_times) + 1), iteration_times, marker='o', color='b')
+# plt.xlabel("Iteration Number")
+# plt.ylabel("Time (seconds)")
+# plt.title("Iteration vs. Time Taken for Local Search Optimization")
+# plt.grid(True)
+# plt.show()
 
-# Open the file in write mode and save the results
-with open(output_filepath, "w") as file:
-    # Write the optimized land coverage area
-    file.write(f"Optimized land coverage area: {optimized_land_coverage:.2f} km²\n\n")
+plot_initial_final_satellites(existing_satellites=existing_satellites_gdf,
+                                  initial_positions=initial_satellites_gdf,
+                                  final_positions=final_satellites_gdf,
+                                  land=land_map,
+                                  ocean=ocean_map,
+                                  buffer=None)
 
-    # Write the header for new satellite positions
-    file.write("New Satellites' Final Positions After Optimization:\n")
+# # Define the output file path
+# output_filepath = Path.cwd() / "data/optimized_satellite_positions.txt"
 
-    # Write each new satellite's final position
-    for _, row in optimized_gdf[optimized_gdf['new_satellite']].iterrows():
-        file.write(f"{row['Satellite Name']}: Latitude {row['Latitude']:.2f}, "
-                   f"Longitude {row['Longitude']:.2f}, Geometry {row['geometry']}\n")
+# # Open the file in write mode and save the results
+# with open(output_filepath, "w") as file:
+#     # Write the optimized land coverage area
+#     file.write(f"Optimized land coverage area: {optimized_land_coverage:.2f} km²\n\n")
 
-print(f"Output saved to {output_filepath}")
+#     # Write the header for new satellite positions
+#     file.write("New Satellites' Final Positions After Optimization:\n")
+
+#     # Write each new satellite's final position
+#     for _, row in optimized_gdf[optimized_gdf['new_satellite']].iterrows():
+#         file.write(f"{row['Satellite Name']}: Latitude {row['Latitude']:.2f}, "
+#                    f"Longitude {row['Longitude']:.2f}, Geometry {row['geometry']}\n")
+
+# print(f"Output saved to {output_filepath}")
