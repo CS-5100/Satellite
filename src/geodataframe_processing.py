@@ -54,7 +54,7 @@ def load_existing_satellites(EPSG: int | str, show_head=False):
         show_head (bool, optional): whether or not to print the first few entries of the GeoDataFrame to standard output. Defaults to False.
 
     Returns:
-        gpd.GeoDataFrame: 
+        gpd.GeoDataFrame:
             a geopandas GeoDataFrame with the following parameters
                     - Satellite (str): the name of the satellite
                     - Longitude (float): the longitude of the satellite in decimal degrees
@@ -64,16 +64,16 @@ def load_existing_satellites(EPSG: int | str, show_head=False):
     """
     # Download TLEs from the internet into a list
     starlink_current_tle_list = tlp.download_current_tles_as_list()
-    
+
     # Convert the TLE list to a DataFrame
     starlink_current = tlp.tles_to_dataframe(raw_tle_list=starlink_current_tle_list)
-    
+
     # Convert the DataFrame into a GeoDataFrame
     starlink_gdf = tlp.tle_dataframe_to_geodataframe(starlink_current)
-    
+
     # Re-project the GeoDataFrame onto the specified coordinate reference system
     starlink_gdf = starlink_gdf.to_crs(epsg=EPSG)
-    
+
     # we don't necessarily always want the head of the dataframe to print
     if show_head:
         print(starlink_gdf.head())
@@ -97,7 +97,7 @@ def load_satellites_from_file(
         show_head (bool, optional): whether or not to print the first few entries of the GeoDataFrame to standard output. Defaults to False.
 
     Returns:
-        gpd.GeoDataFrame: 
+        gpd.GeoDataFrame:
             a geopandas GeoDataFrame with the following parameters
                     - Satellite (str): the name of the satellite
                     - Longitude (float): the longitude of the satellite in decimal degrees
@@ -107,7 +107,11 @@ def load_satellites_from_file(
     """
     # current schema is designed so that TLE text files are in this particular directory
     filepath = (
-        Path(__file__).parent.resolve() / ".." / "data" / "tle_text_files" / input_filename
+        Path(__file__).parent.resolve()
+        / ".."
+        / "data"
+        / "tle_text_files"
+        / input_filename
     )
     # Download and convert TLE data to GeoDataFrame for existing satellites
     starlink_tle_list = tlp.convert_TLE_text_file_to_list(input_file_path=filepath)
@@ -295,7 +299,7 @@ def perturb_positions(
     """
     Perturbs positions of a subset of new satellites randomly by up to max_shift_km.
 
-        
+
         random_state (int): Random state for reproducibility.
     """
     """Takes an input GeoDataFrame, projects it to a coordinate reference system with a distance preserving projection,
@@ -341,8 +345,24 @@ def perturb_positions(
     gdf = gdf.to_crs(epsg=eq_area_epsg)
 
 
-def calculate_land_coverage(gdf, map, buffer_radius, print_result=False):
+def calculate_land_coverage(
+    gdf: gpd.GeoDataFrame,
+    map: gpd.GeoDataFrame,
+    buffer_radius: float,
+    print_result=False,
+):
+    """Overlays the coverage areas of the satellites given in a GeoDataFrame onto a map and
+    calculates the area of the intersection of all the objects
 
+    Args:
+        gdf (gpd.GeoDataFrame): a GeoDataFrame defining a set of satellites
+        map (gpd.GeoDataFrame): a GeoDataFrame defining a map to calculate intersection area for
+        buffer_radius (float): The radius of the circle covered by each satellite in meters?
+        print_result (bool, optional): whether or not to print the results of the calculation to standard output. Defaults to False.
+
+    Returns:
+        float: The total map area covered by the given satellites in square kilometers
+    """
     # copy the initial array to prevent mutation
     buffered_gdf = gdf.copy()
 
