@@ -7,7 +7,18 @@ def plot_initial_final_satellites(existing_satellites: gpd.GeoDataFrame,
                                   land: gpd.GeoDataFrame,
                                   ocean: gpd.GeoDataFrame,
                                   buffer=None):
-    
+    """Generates two plots of the earth with satellites on it, the top plot mapping initial satellite placements
+    and the bottom plot mapping where the satellites ended up after processing
+
+    Args:
+        existing_satellites (gpd.GeoDataFrame): GeoDataFrame defining the satellites already in the satellite constellation
+        initial_positions (gpd.GeoDataFrame): GeoDataFrame defining the initial positions of the proposed candidate satellites
+        final_positions (gpd.GeoDataFrame): GeoDataFrame defining the final positions of the proposed candidate satellites
+        land (gpd.GeoDataFrame): GeoDataFrame defining the land masses
+        ocean (gpd.GeoDataFrame): GeoDataFrame defining the ocean
+        buffer (_type_, optional): The radius of the circles to plot around each satellite in meters.
+            If none, the points shown do not correlate to actual coverage areas. Defaults to None.
+    """
     initial_fig, initial_ax = plt.subplots(2, 1)
     before_ax = initial_ax[0]
     after_ax = initial_ax[1]
