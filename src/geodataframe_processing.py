@@ -132,6 +132,8 @@ def generate_new_satellites(
     sample_separate=True,
     random_seed=None,
 ):
+    # TODO: documentation and addressing inconsistencies between import and generation GeoDataFrame columns
+
     # if the user wants to sample points from a predetermined map,
     # but no map is available to sample from, tell the user to provide one and fail
     if input_map is None and true_random is False:
