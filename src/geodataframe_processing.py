@@ -159,9 +159,9 @@ def generate_new_satellites(
 
         # Generate satellite data with coordinates closer to land
         new_satellite_data = {
-            "Satellite Name": [f"NewSat{i+1}" for i in range(num_satellites)],
-            "Latitude": [rng.uniform(*lat_range) for _ in range(num_satellites)],
+            "Satellite": [f"NewSat{i+1}" for i in range(num_satellites)],
             "Longitude": [rng.uniform(*lon_range) for _ in range(num_satellites)],
+            "Latitude": [rng.uniform(*lat_range) for _ in range(num_satellites)],
         }
         new_satellite_data["geometry"] = [
             Point(lon, lat)
@@ -196,9 +196,9 @@ def generate_new_satellites(
 
             # Generate satellite data with coordinates closer to land
             new_satellite_data = {
-                "Satellite Name": [f"NewSat{i+1}" for i in range(num_satellites)],
-                "Latitude": new_coordinates.y,
+                "Satellite": [f"NewSat{i+1}" for i in range(num_satellites)],
                 "Longitude": new_coordinates.x,
+                "Latitude": new_coordinates.y,
                 "geometry": new_points,
             }
 
@@ -227,9 +227,9 @@ def generate_new_satellites(
 
             # Generate satellite data with coordinates closer to land
             new_satellite_data = {
-                "Satellite Name": [f"NewSat{i+1}" for i in range(num_satellites)],
-                "Latitude": aggregate_map_coordinates.y,
+                "Satellite": [f"NewSat{i+1}" for i in range(num_satellites)],
                 "Longitude": aggregate_map_coordinates.x,
+                "Latitude": aggregate_map_coordinates.y,
                 "geometry": aggregate_map_sample_points,
             }
 
