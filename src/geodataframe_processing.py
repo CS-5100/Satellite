@@ -9,35 +9,105 @@ import tle_processing as tlp
 
 
 def load_map_data(map_file_name: str, EPSG: int | str):
+    """Load a set of map data in the map_data project directory into the environment
+    as a geopandas GeoDataFrame
+
+    Args:
+        map_file_name (str): the file name of the map data in the map_data directory
+        EPSG (int | str): the EPSG code specifying the coordinate reference system to import the map data with
+
+    Returns:
+        gpd.GeoDataFrame: a GeoDataFrame with the given map data projected onto a coordinate reference system specified by the input EPSG code
+    """
     # directory where the map files are stored will be static
-    dirpath = (
+    filepath = (
         Path(__file__).parent.resolve() / ".." / "data" / "map_data" / map_file_name
     )
-    output_map = gpd.read_file(filename=dirpath).to_crs(epsg=EPSG)
+    output_map = gpd.read_file(filename=filepath).to_crs(epsg=EPSG)
     return output_map
 
 
 def load_land_ocean_data(EPSG: int | str):
+    """Load land and ocean data from the Natural Earth website (https://www.naturalearthdata.com/downloads/10m-physical-vectors/)
+    into the environment as a geopandas GeoDataFrame
+
+    Args:
+        EPSG (int | str): the EPSG code specifying the coordinate reference system to import the land and ocean data with
+
+    Returns:
+        tuple(gpd.GeoDataFrame, gpd.GeoDataFrame):
+            a tuple with a GeoDataFrame containing data describing the land masses of the earth as vector polygons as well as
+            a GeoDataFrame containing data describing the oceans of the earth as vector polygons
+    """
     land = load_map_data("ne_10m_land_scale_rank.zip", EPSG=EPSG)
     ocean = load_map_data("ne_10m_ocean_scale_rank.zip", EPSG=EPSG)
     return land, ocean
 
 
 def load_existing_satellites(EPSG: int | str, show_head=False):
-    # Download and convert TLE data to GeoDataFrame for existing satellites
+    """A function creating an automated pipeline to download TLE data from the CelesTrak website
+    (https://celestrak.org/NORAD/elements/supplemental/sup-gp.php?FILE=starlink&FORMAT=tle) directly into
+    a GeoDataFrame object
+
+    Args:
+        EPSG (int | str): the EPSG code specifying the coordinate reference system to project the satellite data to
+        show_head (bool, optional): whether or not to print the first few entries of the GeoDataFrame to standard output. Defaults to False.
+
+    Returns:
+        gpd.GeoDataFrame: 
+            a geopandas GeoDataFrame with the following parameters
+                    - Satellite (str): the name of the satellite
+                    - Longitude (float): the longitude of the satellite in decimal degrees
+                    - Latitude (float): the latitude of the satellite in decimal degrees
+                    - Altitude (float): the altitude of the satellite in kilometers
+                    - geometry (shapely Point): the shapely Point object representing the underlying satellite position
+    """
+    # Download TLEs from the internet into a list
     starlink_current_tle_list = tlp.download_current_tles_as_list()
+    
+    # Convert the TLE list to a DataFrame
     starlink_current = tlp.tles_to_dataframe(raw_tle_list=starlink_current_tle_list)
+    
+    # Convert the DataFrame into a GeoDataFrame
     starlink_gdf = tlp.tle_dataframe_to_geodataframe(starlink_current)
+    
+    # Re-project the GeoDataFrame onto the specified coordinate reference system
     starlink_gdf = starlink_gdf.to_crs(epsg=EPSG)
+    
     # we don't necessarily always want the head of the dataframe to print
     if show_head:
         print(starlink_gdf.head())
     return starlink_gdf
 
-def load_satellites_from_file(EPSG: int | str, input_filename: str, time = datetime.now(tz=timezone.utc), show_head=False):
+
+def load_satellites_from_file(
+    EPSG: int | str,
+    input_filename: str,
+    time=datetime.now(tz=timezone.utc),
+    show_head=False,
+):
+    """A function creating an automated pipeline to take a text file with TLE data in the tle_text_files
+    project directory, collected at a particular datetime, and load it into the environment directly as a
+    GeoDataFrame object
+
+    Args:
+        EPSG (int | str): the EPSG code specifying the coordinate reference system to project the satellite data to
+        input_filename (str): the name of the file in the tle_text_files directory to import as a GeoDataFrame
+        time (datetime, optional): the datetime that the data was collected. Defaults to datetime.now(tz=timezone.utc).
+        show_head (bool, optional): whether or not to print the first few entries of the GeoDataFrame to standard output. Defaults to False.
+
+    Returns:
+        gpd.GeoDataFrame: 
+            a geopandas GeoDataFrame with the following parameters
+                    - Satellite (str): the name of the satellite
+                    - Longitude (float): the longitude of the satellite in decimal degrees
+                    - Latitude (float): the latitude of the satellite in decimal degrees
+                    - Altitude (float): the altitude of the satellite in kilometers
+                    - geometry (shapely Point): the shapely Point object representing the underlying satellite position
+    """
     # current schema is designed so that TLE text files are in this particular directory
     filepath = (
-        Path(__file__).parent.resolve() / ".." / "data" / "map_data" / input_filename
+        Path(__file__).parent.resolve() / ".." / "data" / "tle_text_files" / input_filename
     )
     # Download and convert TLE data to GeoDataFrame for existing satellites
     starlink_tle_list = tlp.convert_TLE_text_file_to_list(input_file_path=filepath)
@@ -56,7 +126,7 @@ def generate_new_satellites(
     input_map=None,
     true_random=True,
     sample_separate=True,
-    random_seed=None
+    random_seed=None,
 ):
     # if the user wants to sample points from a predetermined map,
     # but no map is available to sample from, tell the user to provide one and fail
@@ -73,10 +143,10 @@ def generate_new_satellites(
         map = map.to_crs(epsg=4326)
 
     if true_random:
-        
+
         # create random number generator
         rng = np.random.default_rng(seed=random_seed)
-        
+
         # Bounds to center satellites near common land areas (adjust as needed)
         lat_range = (-60, 70)  # Latitude range covering most inhabited regions
         lon_range = (-180, 180)  # Longitude range covering major land areas
@@ -167,7 +237,17 @@ def generate_new_satellites(
 
 # create function to wrap a point around the globe if necessary
 def wrap(point: Point, EPSG: int | str):
+    """takes a shapely Point object and re-maps its x and y coordinates to lie within the bounds
+    of a Cartesian coordinate system defined by an EPSG-specified coordinate reference system
 
+    Args:
+        point (Point): a shapely Point object describing a point in a Cartesian coordinate system
+        EPSG (int | str): the EPSG code of the coordinate reference system to re-map the point within
+
+    Returns:
+        point (Point): a shapely Point object describing a valid point in a Cartesian coordinate system within
+        the bounds of a given coordinate reference system
+    """
     # get the projected bounds of the CRS in cartesian coordinates
     eq_dist_crs = pyproj.CRS.from_epsg(EPSG)
     transformer = pyproj.Transformer.from_crs(
@@ -215,16 +295,24 @@ def perturb_positions(
     """
     Perturbs positions of a subset of new satellites randomly by up to max_shift_km.
 
-    Args:
-        gdf (GeoDataFrame): The GeoDataFrame containing satellite positions.
-        new_satellite_column (str): Column name indicating new satellites.
-        max_shift_km (float): Maximum shift in kilometers for each satellite.
+        
         random_state (int): Random state for reproducibility.
     """
-    
+    """Takes an input GeoDataFrame, projects it to a coordinate reference system with a distance preserving projection,
+    perturbs the coordinates of the given satellites randomly by an amount up to max_shift_km kilometers, re-maps any points
+    that may not specify valid coordinates, and then re-projects the points back to an equal area coordinate reference system
+
+    Args:
+        gdf (gpd.GeoDataFrame): The GeoDataFrame containing satellite positions.
+        new_satellite_column (str): Column name indicating new satellites.
+        eq_dist_epsg (int | str): an equal distance coordinate reference system specified by an EPSG code
+        eq_area_epsg (int | str): an equal area coordinate reference system specified by an EPSG code
+        max_shift_km (float): Maximum shift in kilometers for each satellite.
+        random_state (int, optional): The number specifying a random seed for a random number generator. Defaults to None.
+    """
     # create random number generator
     rng = np.random.default_rng(seed=random_state)
-    
+
     # Define the max shift in meters
     max_shift_m = max_shift_km * 1000  # Convert km to meters
 
@@ -254,17 +342,15 @@ def perturb_positions(
 
 
 def calculate_land_coverage(gdf, map, buffer_radius, print_result=False):
-    
+
     # copy the initial array to prevent mutation
     buffered_gdf = gdf.copy()
-    
+
     # filter out any points that have NaN coordinates, as they should not contribute
-    buffered_gdf = buffered_gdf[buffered_gdf['geometry'].is_valid]
-    
+    buffered_gdf = buffered_gdf[buffered_gdf["geometry"].is_valid]
+
     # Apply a buffer around each satellite to simulate coverage
-    buffered_gdf["geometry"] = buffered_gdf["geometry"].buffer(
-        buffer_radius
-    )
+    buffered_gdf["geometry"] = buffered_gdf["geometry"].buffer(buffer_radius)
 
     # Find intersection area between satellite coverage and land area
     intersections = buffered_gdf.overlay(map, how="intersection")
