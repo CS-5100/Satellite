@@ -1,4 +1,5 @@
 import pandas as pd
+import pyproj
 import geodataframe_processing as gdfp
 from search_functions import hill_climbing
 from custom_plotting import plot_initial_final_satellites
@@ -11,8 +12,13 @@ PERTURB_DISTANCE_KM = (
 EQUAL_DISTANCE_EPSG = 4087
 EQUAL_AREA_EPSG = 6933
 
+# initial check what the bounds are for the given projection
+eq_area = pyproj.CRS.from_epsg(EQUAL_AREA_EPSG)
+transformer = pyproj.Transformer.from_crs(eq_area.geodetic_crs, eq_area, always_xy=True)
+print(transformer.transform_bounds(*eq_area.area_of_use.bounds))
+
 # Load existing satellite data from TLEs and flag new satellites
-existing_satellites_gdf = gdfp.load_existing_satellites(EPSG=EQUAL_AREA_EPSG)
+existing_satellites_gdf = gdfp.load_existing_satellites(EPSG=EQUAL_AREA_EPSG, show_head=True)
 existing_satellites_gdf["new_satellite"] = False  # Mark existing satellites
 
 # Load map data
@@ -56,7 +62,7 @@ optimized_gdf_geodetic["Longitude"] = optimized_gdf_geodetic_coordinates.x
 print("\nNew Satellites' Final Positions After Optimization:")
 print(
     optimized_gdf_geodetic[optimized_gdf_geodetic["new_satellite"]][
-        ["Satellite Name", "Latitude", "Longitude", "geometry"]
+        ["Satellite", "Longitude", "Latitude", "geometry"]
     ]
 )
 
