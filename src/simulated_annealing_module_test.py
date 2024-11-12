@@ -11,7 +11,7 @@ EQUAL_DISTANCE_EPSG = 4087
 EQUAL_AREA_EPSG = 6933
 
 # Global Parameters
-BUFFER_RADIUS = 121065
+BUFFER_RADIUS = 12065 # 121065
 PERTURB_DISTANCE_KM = 500
 
 # Load existing satellite data from TLEs and flag new satellites
