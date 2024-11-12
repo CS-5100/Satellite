@@ -46,6 +46,7 @@ optimized_gdf, optimized_land_coverage = hill_climbing(
     equal_area_epsg=EQUAL_AREA_EPSG,
     perturbation_distance=PERTURB_DISTANCE_KM,
     num_iterations=30,
+    print_progress=True
 )
 
 # extracting the new satellites from the GeoDataFrame for plotting purposes
