@@ -115,7 +115,7 @@ def load_satellites_from_file(
     )
     # Download and convert TLE data to GeoDataFrame for existing satellites
     starlink_tle_list = tlp.convert_TLE_text_file_to_list(input_file_path=filepath)
-    starlink_current = tlp.tles_to_dataframe(raw_tle_list=starlink_tle_list)
+    starlink_current = tlp.tles_to_dataframe(raw_tle_list=starlink_tle_list, time=time)
     starlink_gdf = tlp.tle_dataframe_to_geodataframe(starlink_current)
     starlink_gdf = starlink_gdf.to_crs(epsg=EPSG)
     # we don't necessarily always want the head of the dataframe to print
