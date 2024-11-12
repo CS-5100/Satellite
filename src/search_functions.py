@@ -1,4 +1,5 @@
 import geodataframe_processing as gdfp
+import pandas as pd
 import numpy as np
 import time
 import math
@@ -75,20 +76,26 @@ def random_restart_simulated_annealing(
     # create random number generator
     rng = np.random.default_rng(seed=random_seed)
 
+    # copy initial satellite geodataframe
+    # into two separate geodataframes
     best_gdf = satellite_gdf.copy()
+    current_gdf = best_gdf.copy()
+
+    # initialize the best land coverage section
+    # and current land coverage section
     best_land_coverage = gdfp.calculate_land_coverage(
         gdf=best_gdf, map=map, buffer_radius=buffer_radius
     )
-
-    current_gdf = best_gdf.copy()
     current_land_coverage = best_land_coverage
+
+    # initialize temperature variables
     temperature = initial_temp
 
     # Tracking iteration times and land coverage for plotting
     iteration_times = []
     best_land_coverage_list = []
 
-    # Restart counter
+    # Initialize restart counter
     stagnation_counter = 0
 
     for iteration in range(num_iterations):
@@ -121,12 +128,16 @@ def random_restart_simulated_annealing(
             math.exp(delta_coverage / temperature) if delta_coverage < 0 else 1
         )
 
+        # if we find a configuration that improves the land coverage
+        # or the temperature allows us to accept a worse solution
+        # re-set the current geodataframe and coverage
         if delta_coverage > 0 or rng.random() < acceptance_probability:
             print(
                 f"Accepted new configuration with land coverage: {new_land_coverage:.2f} km²"
             )
             current_gdf, current_land_coverage = new_gdf, new_land_coverage
             stagnation_counter = 0  # Reset stagnation counter
+
             # Update best solution if this is the best encountered so far
             if new_land_coverage > best_land_coverage:
                 best_gdf, best_land_coverage = new_gdf, new_land_coverage
@@ -142,10 +153,32 @@ def random_restart_simulated_annealing(
         # Check if we should restart due to stagnation
         if stagnation_counter >= restart_threshold:
             print("Random restart due to stagnation.")
-            current_gdf = satellite_gdf.copy()
+
+            # get the current existing satellites from the input dataframe
+            current_existing_satellite_gdf = satellite_gdf[
+                satellite_gdf[new_satellite_column] == False
+            ].copy()
+
+            # generate a new set of candidate satellites
+            new_candidate_satellite_gdf = gdfp.generate_new_satellites(
+                EPSG=equal_area_epsg,
+                num_satellites=30,
+                input_map=map,
+                true_random=False,
+                sample_separate=False,
+            )
+
+            # concatenate both geodataframes to replace the current geodataframe
+            current_gdf = pd.concat(
+                [current_existing_satellite_gdf, new_candidate_satellite_gdf]
+            )
+
+            # get the land coverage
             current_land_coverage = gdfp.calculate_land_coverage(
                 current_gdf, map, buffer_radius
             )
+
+            # reset the stagnation counter annd temperature
             stagnation_counter = 0  # Reset the stagnation counter
             temperature = initial_temp  # Reset temperature for new start
 
