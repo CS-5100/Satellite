@@ -24,8 +24,12 @@ def hill_climbing(
     best_land_coverage = gdfp.calculate_land_coverage(
         gdf=best_gdf, map=map, buffer_radius=buffer_radius
     )
+    
+    iteration_time_list = []
+    best_coverage_list = []
 
     for iteration in range(num_iterations):
+        iteration_start = time.time()
         if print_progress:
             print(f"Iteration {iteration + 1}/{num_iterations}")
 
@@ -54,9 +58,16 @@ def hill_climbing(
         else:
             if print_progress:
                 print("No improvement in land coverage.")
+        iteration_end = time.time()
+        
+        iteration_duration = iteration_end - iteration_start
+        
+        best_coverage_list.append(best_land_coverage)
+        iteration_time_list.append(iteration_duration)
+                
     if print_progress:
         print(f"Optimized land coverage area: {best_land_coverage:.2f} km²")
-    return best_gdf, best_land_coverage
+    return best_gdf, best_land_coverage, iteration_time_list, best_coverage_list
 
 
 def random_restart_simulated_annealing(
