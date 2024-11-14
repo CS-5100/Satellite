@@ -1,9 +1,10 @@
 # Satellite Coverage Analysis
 
-This repository provides tools to determine optimal satellite positions for achieving maximum area coverage on Earth. By using Two-Line Element (TLE) data, geographic transformations, and spatial data processing, this project analyzes the unique coverage area of satellite constellations. It provides functions to calculate each satellite’s position in 3D Earth-Centered coordinates and to compute coverage overlap, enabling analysis and optimization of satellite configurations for efficient global coverage.
+The repository contains a set of tools aimed at optimizing the placing of the Starlink constellation in order to achieve maximum area coverage. Using Two-Line Element data, geographic transformations, and spatial data processing, the project analyzes and optimizes the unique area covered by the satellite network.
 
 ## Table of Contents
 
+- [Project Overview](#project-overview)
 - [Getting Started](#getting-started)
 - [Features](#features)
 - [Installation](#installation)
@@ -16,6 +17,9 @@ This repository provides tools to determine optimal satellite positions for achi
 - [License](#license)
 
 ---
+## Project Overview
+
+The SpaceX Starlink network is currently the most extensive and technologically advanced satellite constellation in low earth orbit, offering high-speed, low-latency broadband internet worldwide. This work focuses on improving the performance of Starlink by solving the optimization problem of satellite positioning to achieve maximum area coverage.
 
 ## Getting Started
 
@@ -83,7 +87,7 @@ position2 = (540, 50, 20)   # Satellite 2's position
 distance = calculate_distance(position1, position2)
 ```
 
-### Computer Unique Coverage Area
+### Compute Unique Coverage Area
 
 To calculate the unique coverage area:
 
