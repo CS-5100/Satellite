@@ -32,7 +32,17 @@ BUFFER_PLOTS = True
 dirpath = Path(__file__).parent.resolve() / ".." / "data"
 
 def load_map_data():
-    # Load land and ocean map data (adjust paths as necessary)
+
+    """
+    This function reads geographic data for land and ocean areas from ZIP files
+    and converts them to a specified equal-area projection.
+
+    Returns:
+        tuple: A tuple containing two GeoDataFrames:
+            - land_map (geopandas.GeoDataFrame): Processed land area data.
+            - ocean_map (geopandas.GeoDataFrame): Processed ocean area data.
+    """
+    
     land_filepath = dirpath / "map_data" / "ne_10m_land_scale_rank.zip"
     ocean_filepath = dirpath / "map_data" / "ne_10m_ocean_scale_rank.zip"
     land_map = gpd.read_file(filename=land_filepath).to_crs(epsg=EQUAL_AREA_EPSG)
