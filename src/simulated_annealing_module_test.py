@@ -12,7 +12,7 @@ EQUAL_AREA_EPSG = 6933
 
 # Global Parameters
 BUFFER_RADIUS = 12065 # 121065
-PERTURB_DISTANCE_KM = 500
+PERTURB_DISTANCE_KM = 50
 
 # Load existing satellite data from TLEs and flag new satellites
 existing_satellites_gdf = gdfp.load_existing_satellites(EPSG=EQUAL_AREA_EPSG)
@@ -43,7 +43,7 @@ optimized_gdf, optimized_land_coverage, iteration_times, best_land_coverage_list
         equal_distance_epsg=EQUAL_DISTANCE_EPSG,
         equal_area_epsg=EQUAL_AREA_EPSG,
         perturbation_distance=PERTURB_DISTANCE_KM,
-        num_iterations=30,
+        num_iterations=100,
     )
 )
 

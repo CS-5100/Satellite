@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 import geopandas as gpd
 import numpy as np
 import pyproj
+from shapely.errors import GEOSException
 from shapely import Point
 from shapely.affinity import translate
 import tle_processing as tlp
@@ -266,25 +267,32 @@ def wrap(point: Point, EPSG: int | str):
     # get the total length of the map along each direction
     map_length_x = max_lon - min_lon
     map_length_y = max_lat - min_lat
+    
+    try:
+        x_coordinate = point.x
+        y_coordinate = point.y
+    except GEOSException:
+        print("point had a NaN entry or was empty")
+        return point
 
     # if the point is off the left edge of the earth,
     # shift the coordinate to the right by a map length
-    if point.x < min_lon:
+    if x_coordinate < min_lon:
         point = translate(point, xoff=map_length_x)
 
     # if the point is off the right edge of the earth,
     # shift the coordinate to the left by a map length
-    if point.x > max_lon:
+    if x_coordinate > max_lon:
         point = translate(point, xoff=-map_length_x)
 
     # if the point is off the bottom edge of the earth,
     # shift the coordinate upwards by a map length
-    if point.y < min_lat:
+    if y_coordinate < min_lat:
         point = translate(point, yoff=map_length_y)
 
     # if the point is off the top edge of the earth
     # shift the coordinate downwards by a map length
-    if point.y > max_lat:
+    if y_coordinate > max_lat:
         point = translate(point, yoff=-map_length_y)
 
     return point
