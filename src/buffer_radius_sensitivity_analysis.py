@@ -40,14 +40,14 @@ def buffer_variation_hc(
     equal_distance_epsg,
     input_map,
     perturb_dist,
-    ls_iter = 10,
+    ls_iter=10,
     initial_buffer=12065,
     multipliers=[0.5, 1, 2, 10, 20],
     iterations_per_multiplier=3,
     print_progress=True,
 ):
 
-    earth_land_area_square_meters = 148326000 * 1000000
+    earth_land_area_square_km = 148326000
 
     # initializing lists for the recording of parameters
 
@@ -122,7 +122,7 @@ def buffer_variation_hc(
             # append the total coverage to the multiplier list
             multiplier_coverage_total.append(best_land_coverage)
             percent_total_land_coverage = 100 * (
-                best_land_coverage / earth_land_area_square_meters
+                best_land_coverage / earth_land_area_square_km
             )
             multiplier_percent_coverage.append(percent_total_land_coverage)
 
@@ -132,7 +132,7 @@ def buffer_variation_hc(
                 gdf=new_satellites, map=input_map, buffer_radius=br
             )
             percent_land_coverage_above_existing = 100 * (
-                added_land_coverage / earth_land_area_square_meters
+                added_land_coverage / earth_land_area_square_km
             )
             multiplier_coverage_above_existing.append(added_land_coverage)
             multiplier_percent_above_existing.append(
@@ -144,8 +144,7 @@ def buffer_variation_hc(
                 best_land_coverage - initial_land_coverage
             )
             percent_land_coverage_above_initial = 100 * (
-                (best_land_coverage - initial_land_coverage)
-                / earth_land_area_square_meters
+                (best_land_coverage - initial_land_coverage) / earth_land_area_square_km
             )
             multiplier_percent_above_initial.append(percent_land_coverage_above_initial)
 
@@ -213,7 +212,7 @@ def buffer_variation_rrsa(
     equal_distance_epsg,
     input_map,
     perturb_dist,
-    ls_iter = 10,
+    ls_iter=10,
     init_temp=1000,
     cr=0.95,
     restart_thresh=10,
@@ -222,7 +221,7 @@ def buffer_variation_rrsa(
     iterations_per_multiplier=3,
 ):
 
-    earth_land_area_square_meters = 148326000 * 1000000
+    earth_land_area_square_km = 148326000
 
     # initializing lists for the recording of parameters
 
@@ -301,7 +300,7 @@ def buffer_variation_rrsa(
             # append the total coverage to the multiplier list
             multiplier_coverage_total.append(best_land_coverage)
             percent_total_land_coverage = 100 * (
-                best_land_coverage / earth_land_area_square_meters
+                best_land_coverage / earth_land_area_square_km
             )
             multiplier_percent_coverage.append(percent_total_land_coverage)
 
@@ -311,7 +310,7 @@ def buffer_variation_rrsa(
                 gdf=new_satellites, map=input_map, buffer_radius=br
             )
             percent_land_coverage_above_existing = 100 * (
-                added_land_coverage / earth_land_area_square_meters
+                added_land_coverage / earth_land_area_square_km
             )
             multiplier_coverage_above_existing.append(added_land_coverage)
             multiplier_percent_above_existing.append(
@@ -323,8 +322,7 @@ def buffer_variation_rrsa(
                 best_land_coverage - initial_land_coverage
             )
             percent_land_coverage_above_initial = 100 * (
-                (best_land_coverage - initial_land_coverage)
-                / earth_land_area_square_meters
+                (best_land_coverage - initial_land_coverage) / earth_land_area_square_km
             )
             multiplier_percent_above_initial.append(percent_land_coverage_above_initial)
 
@@ -384,6 +382,7 @@ def buffer_variation_rrsa(
         average_percent_above_initial,
         median_absolute_deviation_percent_above_initial,
     )
+
 
 # running the loops for each algorithm
 (
@@ -472,3 +471,78 @@ def plot_for_sensitivity_analysis(
     plt.title(title)
 
     return fig
+
+
+default_multipliers = [0.5, 1, 2, 10, 20]
+default_buffer = 12065
+
+durations_versus_buffer = plot_for_sensitivity_analysis(
+    multipliers=default_multipliers,
+    initial_buffer=default_buffer,
+    hc_parameter=hc_average_durations,
+    hc_error=hc_median_absolute_deviation_duration,
+    rrsa_parameter=rrsa_average_durations,
+    rrsa_error=rrsa_median_absolute_deviation_duration,
+    y_label="Duration,\nSeconds",
+    title="Runtime Duration as a function of Coverage Radius",
+)
+total_coverage_versus_buffer = plot_for_sensitivity_analysis(
+    multipliers=default_multipliers,
+    initial_buffer=default_buffer,
+    hc_parameter=hc_average_total_coverage,
+    hc_error=hc_median_absolute_deviation_coverage,
+    rrsa_parameter=rrsa_average_total_coverage,
+    rrsa_error=rrsa_median_absolute_deviation_coverage,
+    y_label="Total Coverage Area,\nSquare Km",
+    title="Total Satellite Coverage Area\nas a Function of Coverage Radius",
+)
+coverage_above_existing_versus_buffer = plot_for_sensitivity_analysis(
+    multipliers=default_multipliers,
+    initial_buffer=default_buffer,
+    hc_parameter=hc_average_added_coverage_above_existing,
+    hc_error=hc_median_absolute_deviation_above_existing,
+    rrsa_parameter=rrsa_average_added_coverage_above_existing,
+    rrsa_error=rrsa_median_absolute_deviation_above_existing,
+    y_label="Added Coverage Area\nSquare Km",
+    title="Coverage Area Added Above Existing Satellite Constellation\nas a Function of Coverage Radius",
+)
+coverage_above_initial_versus_buffer = plot_for_sensitivity_analysis(
+    multipliers=default_multipliers,
+    initial_buffer=default_buffer,
+    hc_parameter=hc_average_added_coverage_above_initial,
+    hc_error=hc_median_absolute_deviation_above_initial,
+    rrsa_parameter=rrsa_average_added_coverage_above_initial,
+    rrsa_error=rrsa_median_absolute_deviation_above_initial,
+    y_label="Added Coverage Area\nSquare Km",
+    title="Coverage Area Added Above Initial Random Placement\nas a Function of Coverage Radius",
+)
+percent_coverage_versus_buffer = plot_for_sensitivity_analysis(
+    multipliers=default_multipliers,
+    initial_buffer=default_buffer,
+    hc_parameter=hc_average_percent_coverage,
+    hc_error=hc_median_absolute_deviation_percent_coverage,
+    rrsa_parameter=rrsa_average_percent_coverage,
+    rrsa_error=rrsa_median_absolute_deviation_percent_coverage,
+    y_label="Percent Land Coverage",
+    title="Total Percent Land Area Covered\nas a Function of Coverage Radius",
+)
+percent_above_existing_versus_buffer = plot_for_sensitivity_analysis(
+    multipliers=default_multipliers,
+    initial_buffer=default_buffer,
+    hc_parameter=hc_average_percent_above_existing,
+    hc_error=hc_median_absolute_deviation_percent_above_existing,
+    rrsa_parameter=rrsa_average_percent_above_existing,
+    rrsa_error=rrsa_median_absolute_deviation_percent_above_existing,
+    y_label="Percent Added Land Coverage",
+    title="Percent Land Area Added Above Existing Satellites\nas a Function of Coverage Radius",
+)
+percent_above_initial_versus_buffer = plot_for_sensitivity_analysis(
+    multipliers=default_multipliers,
+    initial_buffer=default_buffer,
+    hc_parameter=hc_average_percent_above_initial,
+    hc_error=hc_median_absolute_deviation_percent_above_initial,
+    rrsa_parameter=rrsa_average_percent_above_initial,
+    rrsa_error=rrsa_median_absolute_deviation_percent_above_initial,
+    y_label="Percent Added Land Coverage",
+    title="Percent Land Area Added Above Initial Configuration\nas a Function of Coverage Radius",
+)
