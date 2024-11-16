@@ -45,7 +45,7 @@ def load_land_ocean_data(EPSG: int | str):
     return land, ocean
 
 
-def load_existing_satellites(EPSG: int | str, show_head=False):
+def load_existing_satellites(EPSG: int | str, show_head=False, mark=True):
     """A function creating an automated pipeline to download TLE data from the CelesTrak website
     (https://celestrak.org/NORAD/elements/supplemental/sup-gp.php?FILE=starlink&FORMAT=tle) directly into
     a GeoDataFrame object
@@ -53,6 +53,7 @@ def load_existing_satellites(EPSG: int | str, show_head=False):
     Args:
         EPSG (int | str): the EPSG code specifying the coordinate reference system to project the satellite data to
         show_head (bool, optional): whether or not to print the first few entries of the GeoDataFrame to standard output. Defaults to False.
+        mark (bool, optional): whether or not to mark the satellites as old/existing satellites. Defaults to True.
 
     Returns:
         gpd.GeoDataFrame:
@@ -75,6 +76,10 @@ def load_existing_satellites(EPSG: int | str, show_head=False):
     # Re-project the GeoDataFrame onto the specified coordinate reference system
     starlink_gdf = starlink_gdf.to_crs(epsg=EPSG)
 
+    # if requested, mark the satellites as existing satellites
+    if mark:
+        starlink_gdf["new_satellite"] = False
+
     # we don't necessarily always want the head of the dataframe to print
     if show_head:
         print(starlink_gdf.head())
@@ -86,6 +91,7 @@ def load_satellites_from_file(
     input_filename: str,
     time=datetime.now(tz=timezone.utc),
     show_head=False,
+    mark=True,
 ):
     """A function creating an automated pipeline to take a text file with TLE data in the tle_text_files
     project directory, collected at a particular datetime, and load it into the environment directly as a
@@ -96,6 +102,7 @@ def load_satellites_from_file(
         input_filename (str): the name of the file in the tle_text_files directory to import as a GeoDataFrame
         time (datetime, optional): the datetime that the data was collected. Defaults to datetime.now(tz=timezone.utc).
         show_head (bool, optional): whether or not to print the first few entries of the GeoDataFrame to standard output. Defaults to False.
+        mark (bool, optional): whether or not to mark these satellites as old satellites. Defaults to True.
 
     Returns:
         gpd.GeoDataFrame:
@@ -119,6 +126,8 @@ def load_satellites_from_file(
     starlink_current = tlp.tles_to_dataframe(raw_tle_list=starlink_tle_list, time=time)
     starlink_gdf = tlp.tle_dataframe_to_geodataframe(starlink_current)
     starlink_gdf = starlink_gdf.to_crs(epsg=EPSG)
+    if mark:
+        starlink_gdf["new_satellite"] = False
     # we don't necessarily always want the head of the dataframe to print
     if show_head:
         print(starlink_gdf.head())
@@ -267,7 +276,7 @@ def wrap(point: Point, EPSG: int | str):
     # get the total length of the map along each direction
     map_length_x = max_lon - min_lon
     map_length_y = max_lat - min_lat
-    
+
     try:
         x_coordinate = point.x
         y_coordinate = point.y
