@@ -19,9 +19,9 @@ EQUAL_AREA_EPSG = 6933
 TLE_TIME = datetime(2024, 11, 14, 16, 12, 32, 202983)
 
 # Other Global Parameters
-BASE_PERTURB_DISTANCE_KM = 500
-MULTIPLIERS = [0.1, 0.2, 0.3, 0.4, 0.5, 1, 2, 3, 4, 5]
-LOCAL_SEARCH_ITERATIONS = 100
+BASE_PERTURB_DISTANCE_KM = 100
+MULTIPLIERS = [0.1, 0.2, 0.3, 0.4, 0.5, 1, 2, 3, 4, 5, 10]
+LOCAL_SEARCH_ITERATIONS = 200
 BUFFER = 12065
 
 
@@ -633,7 +633,8 @@ def plot_for_sensitivity_analysis(
     ax.legend(handles=[hc_line, rrsa_line], fontsize="x-small")
     ax.set_xlabel("Perturb Distance, Kilometers")
     ax.set_ylabel(y_label)
-    ax.vlines(x=500, ymin=0, ymax=ymax, linestyles="dashed")
+    ax.vlines(x=100, ymin=0, ymax=ymax, linestyles="dashed")
+    ax.vlines(x=500, ymin=0, ymax=ymax, linestyles="dotted")
     plt.title(title)
 
     return fig
