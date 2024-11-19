@@ -129,8 +129,8 @@ def buffer_variation_hc(
                 print_progress=print_progress,
                 num_iterations=ls_iter,
             )
-            # get the time for the episode and append it to the multiplier list
-            episode_time = np.sum(iteration_time_list)
+            # get the time for the episode in minutes and append it to the multiplier list
+            episode_time = np.sum(iteration_time_list) / 60.0
             multiplier_duration.append(episode_time)
 
             # append the total coverage to the multiplier list
@@ -344,8 +344,8 @@ def buffer_variation_rrsa(
                     restart_threshold=restart_thresh,
                 )
             )
-            # get the time for the episode and append it to the multiplier list
-            episode_time = np.sum(iteration_time_list)
+            # get the time for the episode in minutes and append it to the multiplier list
+            episode_time = np.sum(iteration_time_list) / 60.0
             multiplier_duration.append(episode_time)
 
             # append the total coverage to the multiplier list
@@ -646,8 +646,8 @@ durations_versus_iterations = plot_for_sensitivity_analysis(
     hc_error=hc_median_absolute_deviation_duration,
     rrsa_parameter=rrsa_average_durations,
     rrsa_error=rrsa_median_absolute_deviation_duration,
-    y_label="Duration,\nSeconds",
-    ymax=2000,
+    y_label="Duration,\nMinutes",
+    ymax=60,
     title="Runtime Duration as a Function of Coverage Radius",
 )
 total_coverage_versus_iterations = plot_for_sensitivity_analysis(

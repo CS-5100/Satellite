@@ -130,8 +130,8 @@ def buffer_variation_hc(
                 print_progress=print_progress,
                 num_iterations=ls_iter,
             )
-            # get the time for the episode and append it to the multiplier list
-            episode_time = np.sum(iteration_time_list)
+            # get the time for the episode in minutes and append it to the multiplier list
+            episode_time = np.sum(iteration_time_list) / 60.0
             multiplier_duration.append(episode_time)
 
             # append the total coverage to the multiplier list
@@ -346,7 +346,7 @@ def buffer_variation_rrsa(
                 )
             )
             # get the time for the episode and append it to the multiplier list
-            episode_time = np.sum(iteration_time_list)
+            episode_time = np.sum(iteration_time_list) / 60.0
             multiplier_duration.append(episode_time)
 
             # append the total coverage to the multiplier list
@@ -461,6 +461,40 @@ def buffer_variation_rrsa(
         median_absolute_deviation_percent_above_initial,
     )
 
+# df_2 = pd.read_csv("Buffer_Radius_Sensitivity_Analysis_Results_200iterations_100km.csv")
+# hc_df_2 = df_2[df_2["Algorithm"] == "First-Choice Hill Climbing"]
+# rrsa_df_2 = df_2[df_2["Algorithm"] == "Random Restart Hill Climbing with Simulated Annealing"]
+
+# hc_average_durations = hc_df_2.iloc[:, 3]
+# hc_median_absolute_deviation_duration = hc_df_2.iloc[:, 4]
+# hc_average_total_coverage = hc_df_2.iloc[:, 5]
+# hc_median_absolute_deviation_coverage = hc_df_2.iloc[:, 6]
+# hc_average_added_coverage_above_existing = hc_df_2.iloc[:, 7]
+# hc_median_absolute_deviation_above_existing = hc_df_2.iloc[:, 8]
+# hc_average_added_coverage_above_initial = hc_df_2.iloc[:, 9]
+# hc_median_absolute_deviation_above_initial = hc_df_2.iloc[:, 10]
+# hc_average_percent_coverage = hc_df_2.iloc[:, 11]
+# hc_median_absolute_deviation_percent_coverage = hc_df_2.iloc[:, 12]
+# hc_average_percent_above_existing = hc_df_2.iloc[:, 13]
+# hc_median_absolute_deviation_percent_above_existing = hc_df_2.iloc[:, 14]
+# hc_average_percent_above_initial = hc_df_2.iloc[:, 15]
+# hc_median_absolute_deviation_percent_above_initial = hc_df_2.iloc[:, 16]
+
+# rrsa_average_durations = rrsa_df_2.iloc[:, 3]
+# rrsa_median_absolute_deviation_duration = rrsa_df_2.iloc[:, 4]
+# rrsa_average_total_coverage = rrsa_df_2.iloc[:, 5]
+# rrsa_median_absolute_deviation_coverage = rrsa_df_2.iloc[:, 6]
+# rrsa_average_added_coverage_above_existing = rrsa_df_2.iloc[:, 7]
+# rrsa_median_absolute_deviation_above_existing = rrsa_df_2.iloc[:, 8]
+# rrsa_average_added_coverage_above_initial = rrsa_df_2.iloc[:, 9]
+# rrsa_median_absolute_deviation_above_initial = rrsa_df_2.iloc[:, 10]
+# rrsa_average_percent_coverage = rrsa_df_2.iloc[:, 11]
+# rrsa_median_absolute_deviation_percent_coverage = rrsa_df_2.iloc[:, 12]
+# rrsa_average_percent_above_existing = rrsa_df_2.iloc[:, 13]
+# rrsa_median_absolute_deviation_percent_above_existing = rrsa_df_2.iloc[:, 14]
+# rrsa_average_percent_above_initial = rrsa_df_2.iloc[:, 15]
+# rrsa_median_absolute_deviation_percent_above_initial = rrsa_df_2.iloc[:, 16]
+
 
 # running the loops for each algorithm
 (
@@ -559,7 +593,7 @@ rrsa_df["Algorithm"] = "Random Restart Hill Climbing with Simulated Annealing"
 
 df = pd.concat([hc_df, rrsa_df])
 filename = (
-    "Buffer_Radius_Sensitivity_Analysis_Results"
+    "Buffer_Radius_Sensitivity_Analysis_Results_"
     + str(LOCAL_SEARCH_ITERATIONS)
     + "iterations_"
     + str(PERTURB_DISTANCE_KM)
@@ -595,11 +629,6 @@ print(
     "Random Restart Simulated Annealing Hill Climbing MAD Percent Coverage:",
     rrsa_median_absolute_deviation_percent_coverage,
 )
-
-# import pandas as pd
-# import numpy as np
-# import matplotlib.pyplot as plt
-# from datetime import datetime
 
 # plotting function for this parameter sensitivity analysis
 def plot_for_sensitivity_analysis(
@@ -644,50 +673,6 @@ def plot_for_sensitivity_analysis(
 
     return fig
 
-# PERTURB_DISTANCE_KM = 500
-# MULTIPLIERS = [0.1, 0.5, 1, 2, 5, 10, 20, 50]
-# LOCAL_SEARCH_ITERATIONS = 100
-# BASE_BUFFER = 12065
-
-# new_df = pd.read_csv(
-#     "Buffer_Radius_Sensitivity_Analysis_Results_100iterations_500km.csv", index_col=0
-# )
-# hc_df_2 = new_df[new_df["Algorithm"] == "First-Choice Hill Climbing"]
-# rrsa_df_2 = new_df[
-#     new_df["Algorithm"] == "Random Restart Hill Climbing with Simulated Annealing"
-# ]
-
-
-# hc_average_durations = hc_df_2.iloc[:, 1]
-# hc_median_absolute_deviation_duration = hc_df_2.iloc[:, 2]
-# hc_average_total_coverage = hc_df_2.iloc[:, 3]
-# hc_median_absolute_deviation_coverage = hc_df_2.iloc[:, 4]
-# hc_average_added_coverage_above_existing = hc_df_2.iloc[:, 5]
-# hc_median_absolute_deviation_above_existing = hc_df_2.iloc[:, 6]
-# hc_average_added_coverage_above_initial = hc_df_2.iloc[:, 7]
-# hc_median_absolute_deviation_above_initial = hc_df_2.iloc[:, 8]
-# hc_average_percent_coverage = hc_df_2.iloc[:, 9]
-# hc_median_absolute_deviation_percent_coverage = hc_df_2.iloc[:, 10]
-# hc_average_percent_above_existing = hc_df_2.iloc[:, 11]
-# hc_median_absolute_deviation_percent_above_existing = hc_df_2.iloc[:, 12]
-# hc_average_percent_above_initial = hc_df_2.iloc[:, 13]
-# hc_median_absolute_deviation_percent_above_initial = hc_df_2.iloc[:, 14]
-
-# rrsa_average_durations = rrsa_df_2.iloc[:, 1]
-# rrsa_median_absolute_deviation_duration = rrsa_df_2.iloc[:, 2]
-# rrsa_average_total_coverage = rrsa_df_2.iloc[:, 3]
-# rrsa_median_absolute_deviation_coverage = rrsa_df_2.iloc[:, 4]
-# rrsa_average_added_coverage_above_existing = rrsa_df_2.iloc[:, 5]
-# rrsa_median_absolute_deviation_above_existing = rrsa_df_2.iloc[:, 6]
-# rrsa_average_added_coverage_above_initial = rrsa_df_2.iloc[:, 7]
-# rrsa_median_absolute_deviation_above_initial = rrsa_df_2.iloc[:, 8]
-# rrsa_average_percent_coverage = rrsa_df_2.iloc[:, 9]
-# rrsa_median_absolute_deviation_percent_coverage = rrsa_df_2.iloc[:, 10]
-# rrsa_average_percent_above_existing = rrsa_df_2.iloc[:, 11]
-# rrsa_median_absolute_deviation_percent_above_existing = rrsa_df_2.iloc[:, 12]
-# rrsa_average_percent_above_initial = rrsa_df_2.iloc[:, 13]
-# rrsa_median_absolute_deviation_percent_above_initial = rrsa_df_2.iloc[:, 14]
-
 durations_versus_buffer = plot_for_sensitivity_analysis(
     multipliers=MULTIPLIERS,
     initial_buffer=BASE_BUFFER,
@@ -695,8 +680,8 @@ durations_versus_buffer = plot_for_sensitivity_analysis(
     hc_error=hc_median_absolute_deviation_duration,
     rrsa_parameter=rrsa_average_durations,
     rrsa_error=rrsa_median_absolute_deviation_duration,
-    y_label="Duration,\nSeconds",
-    ymax=2000,
+    y_label="Duration,\nMinutes",
+    ymax=20,
     title="Runtime Duration as a Function of Coverage Radius",
 )
 total_coverage_versus_buffer = plot_for_sensitivity_analysis(
@@ -707,7 +692,7 @@ total_coverage_versus_buffer = plot_for_sensitivity_analysis(
     rrsa_parameter=rrsa_average_total_coverage,
     rrsa_error=rrsa_median_absolute_deviation_coverage,
     y_label="Total Coverage Area,\nSquare Km",
-    ymax=2e9,
+    ymax=2e8,
     title="Total Satellite Coverage Area\nas a Function of Coverage Radius",
 )
 coverage_above_existing_versus_buffer = plot_for_sensitivity_analysis(
@@ -718,7 +703,7 @@ coverage_above_existing_versus_buffer = plot_for_sensitivity_analysis(
     rrsa_parameter=rrsa_average_added_coverage_above_existing,
     rrsa_error=rrsa_median_absolute_deviation_above_existing,
     y_label="Added Coverage Area\nSquare Km",
-    ymax=2e7,
+    ymax=2.5e6,
     title="Coverage Area Added Above Existing Satellite Constellation\nas a Function of Coverage Radius",
 )
 coverage_above_initial_versus_buffer = plot_for_sensitivity_analysis(
@@ -729,7 +714,7 @@ coverage_above_initial_versus_buffer = plot_for_sensitivity_analysis(
     rrsa_parameter=rrsa_average_added_coverage_above_initial,
     rrsa_error=rrsa_median_absolute_deviation_above_initial,
     y_label="Added Coverage Area\nSquare Km",
-    ymax=6e6,
+    ymax=1.25e6,
     title="Coverage Area Added Above Initial Random Placement\nas a Function of Coverage Radius",
 )
 percent_coverage_versus_buffer = plot_for_sensitivity_analysis(
@@ -740,7 +725,7 @@ percent_coverage_versus_buffer = plot_for_sensitivity_analysis(
     rrsa_parameter=rrsa_average_percent_coverage,
     rrsa_error=rrsa_median_absolute_deviation_percent_coverage,
     y_label="Percent Land Coverage",
-    ymax=1500,
+    ymax=150,
     title="Total Percent Land Area Covered\nas a Function of Coverage Radius",
 )
 percent_above_existing_versus_buffer = plot_for_sensitivity_analysis(
@@ -751,7 +736,7 @@ percent_above_existing_versus_buffer = plot_for_sensitivity_analysis(
     rrsa_parameter=rrsa_average_percent_above_existing,
     rrsa_error=rrsa_median_absolute_deviation_percent_above_existing,
     y_label="Percent Added Land Coverage",
-    ymax=13,
+    ymax=2,
     title="Percent Land Area Added Above Existing Satellites\nas a Function of Coverage Radius",
 )
 percent_above_initial_versus_buffer = plot_for_sensitivity_analysis(
@@ -762,7 +747,7 @@ percent_above_initial_versus_buffer = plot_for_sensitivity_analysis(
     rrsa_parameter=rrsa_average_percent_above_initial,
     rrsa_error=rrsa_median_absolute_deviation_percent_above_initial,
     y_label="Percent Added Land Coverage",
-    ymax=4,
+    ymax=1,
     title="Percent Land Area Added Above Initial Configuration\nas a Function of Coverage Radius",
 )
 plt.show()
