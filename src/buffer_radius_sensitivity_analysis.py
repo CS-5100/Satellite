@@ -461,40 +461,6 @@ def buffer_variation_rrsa(
         median_absolute_deviation_percent_above_initial,
     )
 
-# df_2 = pd.read_csv("Buffer_Radius_Sensitivity_Analysis_Results_200iterations_100km.csv")
-# hc_df_2 = df_2[df_2["Algorithm"] == "First-Choice Hill Climbing"]
-# rrsa_df_2 = df_2[df_2["Algorithm"] == "Random Restart Hill Climbing with Simulated Annealing"]
-
-# hc_average_durations = hc_df_2.iloc[:, 3]
-# hc_median_absolute_deviation_duration = hc_df_2.iloc[:, 4]
-# hc_average_total_coverage = hc_df_2.iloc[:, 5]
-# hc_median_absolute_deviation_coverage = hc_df_2.iloc[:, 6]
-# hc_average_added_coverage_above_existing = hc_df_2.iloc[:, 7]
-# hc_median_absolute_deviation_above_existing = hc_df_2.iloc[:, 8]
-# hc_average_added_coverage_above_initial = hc_df_2.iloc[:, 9]
-# hc_median_absolute_deviation_above_initial = hc_df_2.iloc[:, 10]
-# hc_average_percent_coverage = hc_df_2.iloc[:, 11]
-# hc_median_absolute_deviation_percent_coverage = hc_df_2.iloc[:, 12]
-# hc_average_percent_above_existing = hc_df_2.iloc[:, 13]
-# hc_median_absolute_deviation_percent_above_existing = hc_df_2.iloc[:, 14]
-# hc_average_percent_above_initial = hc_df_2.iloc[:, 15]
-# hc_median_absolute_deviation_percent_above_initial = hc_df_2.iloc[:, 16]
-
-# rrsa_average_durations = rrsa_df_2.iloc[:, 3]
-# rrsa_median_absolute_deviation_duration = rrsa_df_2.iloc[:, 4]
-# rrsa_average_total_coverage = rrsa_df_2.iloc[:, 5]
-# rrsa_median_absolute_deviation_coverage = rrsa_df_2.iloc[:, 6]
-# rrsa_average_added_coverage_above_existing = rrsa_df_2.iloc[:, 7]
-# rrsa_median_absolute_deviation_above_existing = rrsa_df_2.iloc[:, 8]
-# rrsa_average_added_coverage_above_initial = rrsa_df_2.iloc[:, 9]
-# rrsa_median_absolute_deviation_above_initial = rrsa_df_2.iloc[:, 10]
-# rrsa_average_percent_coverage = rrsa_df_2.iloc[:, 11]
-# rrsa_median_absolute_deviation_percent_coverage = rrsa_df_2.iloc[:, 12]
-# rrsa_average_percent_above_existing = rrsa_df_2.iloc[:, 13]
-# rrsa_median_absolute_deviation_percent_above_existing = rrsa_df_2.iloc[:, 14]
-# rrsa_average_percent_above_initial = rrsa_df_2.iloc[:, 15]
-# rrsa_median_absolute_deviation_percent_above_initial = rrsa_df_2.iloc[:, 16]
-
 
 # running the loops for each algorithm
 (
@@ -600,6 +566,40 @@ filename = (
     + "km.csv"
 )
 df.to_csv(filename)
+
+# df_2 = pd.read_csv("Buffer_Radius_Sensitivity_Analysis_Results_200iterations_100km.csv")
+# hc_df_2 = df_2[df_2["Algorithm"] == "First-Choice Hill Climbing"]
+# rrsa_df_2 = df_2[df_2["Algorithm"] == "Random Restart Hill Climbing with Simulated Annealing"]
+
+# hc_average_durations = hc_df_2.iloc[:, 3]
+# hc_median_absolute_deviation_duration = hc_df_2.iloc[:, 4]
+# hc_average_total_coverage = hc_df_2.iloc[:, 5]
+# hc_median_absolute_deviation_coverage = hc_df_2.iloc[:, 6]
+# hc_average_added_coverage_above_existing = hc_df_2.iloc[:, 7]
+# hc_median_absolute_deviation_above_existing = hc_df_2.iloc[:, 8]
+# hc_average_added_coverage_above_initial = hc_df_2.iloc[:, 9]
+# hc_median_absolute_deviation_above_initial = hc_df_2.iloc[:, 10]
+# hc_average_percent_coverage = hc_df_2.iloc[:, 11]
+# hc_median_absolute_deviation_percent_coverage = hc_df_2.iloc[:, 12]
+# hc_average_percent_above_existing = hc_df_2.iloc[:, 13]
+# hc_median_absolute_deviation_percent_above_existing = hc_df_2.iloc[:, 14]
+# hc_average_percent_above_initial = hc_df_2.iloc[:, 15]
+# hc_median_absolute_deviation_percent_above_initial = hc_df_2.iloc[:, 16]
+
+# rrsa_average_durations = rrsa_df_2.iloc[:, 3]
+# rrsa_median_absolute_deviation_duration = rrsa_df_2.iloc[:, 4]
+# rrsa_average_total_coverage = rrsa_df_2.iloc[:, 5]
+# rrsa_median_absolute_deviation_coverage = rrsa_df_2.iloc[:, 6]
+# rrsa_average_added_coverage_above_existing = rrsa_df_2.iloc[:, 7]
+# rrsa_median_absolute_deviation_above_existing = rrsa_df_2.iloc[:, 8]
+# rrsa_average_added_coverage_above_initial = rrsa_df_2.iloc[:, 9]
+# rrsa_median_absolute_deviation_above_initial = rrsa_df_2.iloc[:, 10]
+# rrsa_average_percent_coverage = rrsa_df_2.iloc[:, 11]
+# rrsa_median_absolute_deviation_percent_coverage = rrsa_df_2.iloc[:, 12]
+# rrsa_average_percent_above_existing = rrsa_df_2.iloc[:, 13]
+# rrsa_median_absolute_deviation_percent_above_existing = rrsa_df_2.iloc[:, 14]
+# rrsa_average_percent_above_initial = rrsa_df_2.iloc[:, 15]
+# rrsa_median_absolute_deviation_percent_above_initial = rrsa_df_2.iloc[:, 16]
 
 print("\nFirst-Choice Hill Climbing Average Total Coverage:", hc_average_total_coverage)
 print(
