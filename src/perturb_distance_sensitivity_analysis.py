@@ -462,143 +462,143 @@ def perturb_variation_rrsa(
 
 
 # running the loops for each algorithm
-(
-    hc_average_durations,
-    hc_median_absolute_deviation_duration,
-    hc_average_total_coverage,
-    hc_median_absolute_deviation_coverage,
-    hc_average_added_coverage_above_existing,
-    hc_median_absolute_deviation_above_existing,
-    hc_average_added_coverage_above_initial,
-    hc_median_absolute_deviation_above_initial,
-    hc_average_percent_coverage,
-    hc_median_absolute_deviation_percent_coverage,
-    hc_average_percent_above_existing,
-    hc_median_absolute_deviation_percent_above_existing,
-    hc_average_percent_above_initial,
-    hc_median_absolute_deviation_percent_above_initial,
-) = perturb_variation_hc(
-    existing_satellite_gdf=base_gdf,
-    equal_area_epsg=EQUAL_AREA_EPSG,
-    equal_distance_epsg=EQUAL_DISTANCE_EPSG,
-    input_map=land_map,
-    init_perturb_dist=BASE_PERTURB_DISTANCE_KM,
-    ls_iter=LOCAL_SEARCH_ITERATIONS,
-    multipliers=MULTIPLIERS,
-)
+# (
+#     hc_average_durations,
+#     hc_median_absolute_deviation_duration,
+#     hc_average_total_coverage,
+#     hc_median_absolute_deviation_coverage,
+#     hc_average_added_coverage_above_existing,
+#     hc_median_absolute_deviation_above_existing,
+#     hc_average_added_coverage_above_initial,
+#     hc_median_absolute_deviation_above_initial,
+#     hc_average_percent_coverage,
+#     hc_median_absolute_deviation_percent_coverage,
+#     hc_average_percent_above_existing,
+#     hc_median_absolute_deviation_percent_above_existing,
+#     hc_average_percent_above_initial,
+#     hc_median_absolute_deviation_percent_above_initial,
+# ) = perturb_variation_hc(
+#     existing_satellite_gdf=base_gdf,
+#     equal_area_epsg=EQUAL_AREA_EPSG,
+#     equal_distance_epsg=EQUAL_DISTANCE_EPSG,
+#     input_map=land_map,
+#     init_perturb_dist=BASE_PERTURB_DISTANCE_KM,
+#     ls_iter=LOCAL_SEARCH_ITERATIONS,
+#     multipliers=MULTIPLIERS,
+# )
 
-(
-    rrsa_average_durations,
-    rrsa_median_absolute_deviation_duration,
-    rrsa_average_total_coverage,
-    rrsa_median_absolute_deviation_coverage,
-    rrsa_average_added_coverage_above_existing,
-    rrsa_median_absolute_deviation_above_existing,
-    rrsa_average_added_coverage_above_initial,
-    rrsa_median_absolute_deviation_above_initial,
-    rrsa_average_percent_coverage,
-    rrsa_median_absolute_deviation_percent_coverage,
-    rrsa_average_percent_above_existing,
-    rrsa_median_absolute_deviation_percent_above_existing,
-    rrsa_average_percent_above_initial,
-    rrsa_median_absolute_deviation_percent_above_initial,
-) = perturb_variation_rrsa(
-    existing_satellite_gdf=base_gdf,
-    equal_area_epsg=EQUAL_AREA_EPSG,
-    equal_distance_epsg=EQUAL_DISTANCE_EPSG,
-    input_map=land_map,
-    init_perturb_dist=BASE_PERTURB_DISTANCE_KM,
-    ls_iter=LOCAL_SEARCH_ITERATIONS,
-    multipliers=MULTIPLIERS,
-)
+# (
+#     rrsa_average_durations,
+#     rrsa_median_absolute_deviation_duration,
+#     rrsa_average_total_coverage,
+#     rrsa_median_absolute_deviation_coverage,
+#     rrsa_average_added_coverage_above_existing,
+#     rrsa_median_absolute_deviation_above_existing,
+#     rrsa_average_added_coverage_above_initial,
+#     rrsa_median_absolute_deviation_above_initial,
+#     rrsa_average_percent_coverage,
+#     rrsa_median_absolute_deviation_percent_coverage,
+#     rrsa_average_percent_above_existing,
+#     rrsa_median_absolute_deviation_percent_above_existing,
+#     rrsa_average_percent_above_initial,
+#     rrsa_median_absolute_deviation_percent_above_initial,
+# ) = perturb_variation_rrsa(
+#     existing_satellite_gdf=base_gdf,
+#     equal_area_epsg=EQUAL_AREA_EPSG,
+#     equal_distance_epsg=EQUAL_DISTANCE_EPSG,
+#     input_map=land_map,
+#     init_perturb_dist=BASE_PERTURB_DISTANCE_KM,
+#     ls_iter=LOCAL_SEARCH_ITERATIONS,
+#     multipliers=MULTIPLIERS,
+# )
 
-hc_dict = {
-    "Multiplier": MULTIPLIERS,
-    "Perturb_Dist_Km": np.asarray(MULTIPLIERS) * BASE_PERTURB_DISTANCE_KM,
-    "Median_Duration": hc_average_durations,
-    "MAD_Duration": hc_median_absolute_deviation_duration,
-    "Median_Total_Coverage": hc_average_total_coverage,
-    "MAD_Total_Coverage": hc_median_absolute_deviation_coverage,
-    "Median_Coverage_Above_Existing": hc_average_added_coverage_above_existing,
-    "MAD_Coverage_Above_Existing": hc_median_absolute_deviation_above_existing,
-    "Median_Coverage_Above_Initial": hc_average_added_coverage_above_initial,
-    "MAD_Coverage_Above_Initial": hc_median_absolute_deviation_above_initial,
-    "Median_Percent_Coverage": hc_average_percent_coverage,
-    "MAD_Percent_Coverage": hc_median_absolute_deviation_percent_coverage,
-    "Median_Percent_Coverage_Above_Existing": hc_average_percent_above_existing,
-    "MAD_Percent_Coverage_Above_Existing": hc_median_absolute_deviation_percent_above_existing,
-    "Median_Percent_Coverage_Above_Initial": hc_average_percent_above_initial,
-    "MAD_Percent_Coverage_Above_Initial": hc_median_absolute_deviation_percent_above_initial,
-}
+# hc_dict = {
+#     "Multiplier": MULTIPLIERS,
+#     "Perturb_Dist_Km": np.asarray(MULTIPLIERS) * BASE_PERTURB_DISTANCE_KM,
+#     "Median_Duration": hc_average_durations,
+#     "MAD_Duration": hc_median_absolute_deviation_duration,
+#     "Median_Total_Coverage": hc_average_total_coverage,
+#     "MAD_Total_Coverage": hc_median_absolute_deviation_coverage,
+#     "Median_Coverage_Above_Existing": hc_average_added_coverage_above_existing,
+#     "MAD_Coverage_Above_Existing": hc_median_absolute_deviation_above_existing,
+#     "Median_Coverage_Above_Initial": hc_average_added_coverage_above_initial,
+#     "MAD_Coverage_Above_Initial": hc_median_absolute_deviation_above_initial,
+#     "Median_Percent_Coverage": hc_average_percent_coverage,
+#     "MAD_Percent_Coverage": hc_median_absolute_deviation_percent_coverage,
+#     "Median_Percent_Coverage_Above_Existing": hc_average_percent_above_existing,
+#     "MAD_Percent_Coverage_Above_Existing": hc_median_absolute_deviation_percent_above_existing,
+#     "Median_Percent_Coverage_Above_Initial": hc_average_percent_above_initial,
+#     "MAD_Percent_Coverage_Above_Initial": hc_median_absolute_deviation_percent_above_initial,
+# }
 
-rrsa_dict = {
-    "Multiplier": MULTIPLIERS,
-    "Perturb_Dist_Km": np.asarray(MULTIPLIERS) * BASE_PERTURB_DISTANCE_KM,
-    "Median_Duration": rrsa_average_durations,
-    "MAD_Duration": rrsa_median_absolute_deviation_duration,
-    "Median_Total_Coverage": rrsa_average_total_coverage,
-    "MAD_Total_Coverage": rrsa_median_absolute_deviation_coverage,
-    "Median_Coverage_Above_Existing": rrsa_average_added_coverage_above_existing,
-    "MAD_Coverage_Above_Existing": rrsa_median_absolute_deviation_above_existing,
-    "Median_Coverage_Above_Initial": rrsa_average_added_coverage_above_initial,
-    "MAD_Coverage_Above_Initial": rrsa_median_absolute_deviation_above_initial,
-    "Median_Percent_Coverage": rrsa_average_percent_coverage,
-    "MAD_Percent_Coverage": rrsa_median_absolute_deviation_percent_coverage,
-    "Median_Percent_Coverage_Above_Existing": rrsa_average_percent_above_existing,
-    "MAD_Percent_Coverage_Above_Existing": rrsa_median_absolute_deviation_percent_above_existing,
-    "Median_Percent_Coverage_Above_Initial": rrsa_average_percent_above_initial,
-    "MAD_Percent_Coverage_Above_Initial": rrsa_median_absolute_deviation_percent_above_initial,
-}
+# rrsa_dict = {
+#     "Multiplier": MULTIPLIERS,
+#     "Perturb_Dist_Km": np.asarray(MULTIPLIERS) * BASE_PERTURB_DISTANCE_KM,
+#     "Median_Duration": rrsa_average_durations,
+#     "MAD_Duration": rrsa_median_absolute_deviation_duration,
+#     "Median_Total_Coverage": rrsa_average_total_coverage,
+#     "MAD_Total_Coverage": rrsa_median_absolute_deviation_coverage,
+#     "Median_Coverage_Above_Existing": rrsa_average_added_coverage_above_existing,
+#     "MAD_Coverage_Above_Existing": rrsa_median_absolute_deviation_above_existing,
+#     "Median_Coverage_Above_Initial": rrsa_average_added_coverage_above_initial,
+#     "MAD_Coverage_Above_Initial": rrsa_median_absolute_deviation_above_initial,
+#     "Median_Percent_Coverage": rrsa_average_percent_coverage,
+#     "MAD_Percent_Coverage": rrsa_median_absolute_deviation_percent_coverage,
+#     "Median_Percent_Coverage_Above_Existing": rrsa_average_percent_above_existing,
+#     "MAD_Percent_Coverage_Above_Existing": rrsa_median_absolute_deviation_percent_above_existing,
+#     "Median_Percent_Coverage_Above_Initial": rrsa_average_percent_above_initial,
+#     "MAD_Percent_Coverage_Above_Initial": rrsa_median_absolute_deviation_percent_above_initial,
+# }
 
-hc_df = pd.DataFrame(hc_dict)
-hc_df["Algorithm"] = "First-Choice Hill Climbing"
+# hc_df = pd.DataFrame(hc_dict)
+# hc_df["Algorithm"] = "First-Choice Hill Climbing"
 
-rrsa_df = pd.DataFrame(rrsa_dict)
-rrsa_df["Algorithm"] = "Random Restart Hill Climbing with Simulated Annealing"
+# rrsa_df = pd.DataFrame(rrsa_dict)
+# rrsa_df["Algorithm"] = "Random Restart Hill Climbing with Simulated Annealing"
 
-df = pd.concat([hc_df, rrsa_df])
-filename = (
-    "Perturbation_Distance_Sensitivity_Analysis_Results_"
-    + str(LOCAL_SEARCH_ITERATIONS)
-    + "iterations_"
-    + str(BUFFER)
-    + "m.csv"
-)
-df.to_csv(filename)
+# df = pd.concat([hc_df, rrsa_df])
+# filename = (
+#     "Perturbation_Distance_Sensitivity_Analysis_Results_"
+#     + str(LOCAL_SEARCH_ITERATIONS)
+#     + "iterations_"
+#     + str(BUFFER)
+#     + "m.csv"
+# )
+# df.to_csv(filename)
 
-# df_2 = pd.read_csv("Buffer_Radius_Sensitivity_Analysis_Results_200iterations_100km.csv")
-# hc_df_2 = df_2[df_2["Algorithm"] == "First-Choice Hill Climbing"]
-# rrsa_df_2 = df_2[df_2["Algorithm"] == "Random Restart Hill Climbing with Simulated Annealing"]
+df_2 = pd.read_csv("Perturbation_Distance_Sensitivity_Analysis_Results_200iterations_12065m.csv")
+hc_df_2 = df_2[df_2["Algorithm"] == "First-Choice Hill Climbing"]
+rrsa_df_2 = df_2[df_2["Algorithm"] == "Random Restart Hill Climbing with Simulated Annealing"]
 
-# hc_average_durations = hc_df_2.iloc[:, 3]
-# hc_median_absolute_deviation_duration = hc_df_2.iloc[:, 4]
-# hc_average_total_coverage = hc_df_2.iloc[:, 5]
-# hc_median_absolute_deviation_coverage = hc_df_2.iloc[:, 6]
-# hc_average_added_coverage_above_existing = hc_df_2.iloc[:, 7]
-# hc_median_absolute_deviation_above_existing = hc_df_2.iloc[:, 8]
-# hc_average_added_coverage_above_initial = hc_df_2.iloc[:, 9]
-# hc_median_absolute_deviation_above_initial = hc_df_2.iloc[:, 10]
-# hc_average_percent_coverage = hc_df_2.iloc[:, 11]
-# hc_median_absolute_deviation_percent_coverage = hc_df_2.iloc[:, 12]
-# hc_average_percent_above_existing = hc_df_2.iloc[:, 13]
-# hc_median_absolute_deviation_percent_above_existing = hc_df_2.iloc[:, 14]
-# hc_average_percent_above_initial = hc_df_2.iloc[:, 15]
-# hc_median_absolute_deviation_percent_above_initial = hc_df_2.iloc[:, 16]
+hc_average_durations = hc_df_2.iloc[:, 3]
+hc_median_absolute_deviation_duration = hc_df_2.iloc[:, 4]
+hc_average_total_coverage = hc_df_2.iloc[:, 5]
+hc_median_absolute_deviation_coverage = hc_df_2.iloc[:, 6]
+hc_average_added_coverage_above_existing = hc_df_2.iloc[:, 7]
+hc_median_absolute_deviation_above_existing = hc_df_2.iloc[:, 8]
+hc_average_added_coverage_above_initial = hc_df_2.iloc[:, 9]
+hc_median_absolute_deviation_above_initial = hc_df_2.iloc[:, 10]
+hc_average_percent_coverage = hc_df_2.iloc[:, 11]
+hc_median_absolute_deviation_percent_coverage = hc_df_2.iloc[:, 12]
+hc_average_percent_above_existing = hc_df_2.iloc[:, 13]
+hc_median_absolute_deviation_percent_above_existing = hc_df_2.iloc[:, 14]
+hc_average_percent_above_initial = hc_df_2.iloc[:, 15]
+hc_median_absolute_deviation_percent_above_initial = hc_df_2.iloc[:, 16]
 
-# rrsa_average_durations = rrsa_df_2.iloc[:, 3]
-# rrsa_median_absolute_deviation_duration = rrsa_df_2.iloc[:, 4]
-# rrsa_average_total_coverage = rrsa_df_2.iloc[:, 5]
-# rrsa_median_absolute_deviation_coverage = rrsa_df_2.iloc[:, 6]
-# rrsa_average_added_coverage_above_existing = rrsa_df_2.iloc[:, 7]
-# rrsa_median_absolute_deviation_above_existing = rrsa_df_2.iloc[:, 8]
-# rrsa_average_added_coverage_above_initial = rrsa_df_2.iloc[:, 9]
-# rrsa_median_absolute_deviation_above_initial = rrsa_df_2.iloc[:, 10]
-# rrsa_average_percent_coverage = rrsa_df_2.iloc[:, 11]
-# rrsa_median_absolute_deviation_percent_coverage = rrsa_df_2.iloc[:, 12]
-# rrsa_average_percent_above_existing = rrsa_df_2.iloc[:, 13]
-# rrsa_median_absolute_deviation_percent_above_existing = rrsa_df_2.iloc[:, 14]
-# rrsa_average_percent_above_initial = rrsa_df_2.iloc[:, 15]
-# rrsa_median_absolute_deviation_percent_above_initial = rrsa_df_2.iloc[:, 16]
+rrsa_average_durations = rrsa_df_2.iloc[:, 3]
+rrsa_median_absolute_deviation_duration = rrsa_df_2.iloc[:, 4]
+rrsa_average_total_coverage = rrsa_df_2.iloc[:, 5]
+rrsa_median_absolute_deviation_coverage = rrsa_df_2.iloc[:, 6]
+rrsa_average_added_coverage_above_existing = rrsa_df_2.iloc[:, 7]
+rrsa_median_absolute_deviation_above_existing = rrsa_df_2.iloc[:, 8]
+rrsa_average_added_coverage_above_initial = rrsa_df_2.iloc[:, 9]
+rrsa_median_absolute_deviation_above_initial = rrsa_df_2.iloc[:, 10]
+rrsa_average_percent_coverage = rrsa_df_2.iloc[:, 11]
+rrsa_median_absolute_deviation_percent_coverage = rrsa_df_2.iloc[:, 12]
+rrsa_average_percent_above_existing = rrsa_df_2.iloc[:, 13]
+rrsa_median_absolute_deviation_percent_above_existing = rrsa_df_2.iloc[:, 14]
+rrsa_average_percent_above_initial = rrsa_df_2.iloc[:, 15]
+rrsa_median_absolute_deviation_percent_above_initial = rrsa_df_2.iloc[:, 16]
 
 print("\nFirst-Choice Hill Climbing Average Total Coverage:", hc_average_total_coverage)
 print(
@@ -655,6 +655,7 @@ def plot_for_sensitivity_analysis(
         yerr=hc_error,
         color="orange",
         label="First-Choice Hill Climbing",
+        fmt='o-'
     )
     rrsa_line = ax.errorbar(
         x=distances,
@@ -662,13 +663,14 @@ def plot_for_sensitivity_analysis(
         yerr=rrsa_error,
         color="blue",
         label="Random Restart Hill Climbing +\nSimulated Annealing",
+        fmt='o-'
     )
 
     ax.legend(handles=[hc_line, rrsa_line], fontsize="x-small")
     ax.set_xlabel("Perturb Distance, Kilometers")
     ax.set_ylabel(y_label)
-    ax.vlines(x=100, ymin=0, ymax=ymax, linestyles="dashed")
-    ax.vlines(x=500, ymin=0, ymax=ymax, linestyles="dotted")
+    # ax.vlines(x=100, ymin=0, ymax=ymax, linestyles="dashed")
+    # ax.vlines(x=500, ymin=0, ymax=ymax, linestyles="dotted")
     plt.title(title)
 
     return fig
