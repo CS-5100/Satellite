@@ -36,15 +36,12 @@ Algorithm:
     - Neighboring States: Identify neighboring states of the current solution by making small adjustments.
     - Move to Neighbor: If one of the neighboring states offers a better solution (higher energy, based on an objective), move to this new state. If not, then compute the probability of accepting a low energy solution using:  
     $e^{\frac{\Delta E}{T}} < random(0, 1)$  
-    where ${\Delta E}$ represents the difference in energy between the current and neighbouring states, and $T$ is the temperature.
+    where ${\Delta E}$ represents the difference in energy between the current and the neighbouring state, and $T$ is the temperature. $T$ decays over using a decay factor $d \in (0,1)$.
     - Termination: Repeat this process until no neighboring state is better than the current one or the maximum number of iterations have been reached. At this point, you’ve reached a local optimum.
 
 ## Getting Started
 
-To get started with this project, ensure you have Python installed.
-
-### Python Installation
-This project requires Python 3.9 or 3.10. You can download and install Python for:
+To get started with this project, ensure you have Python installed. This project requires Python 3.9 or 3.10. You can download and install Python for:
 
 Windows: Visit the [Python](https://www.python.org/downloads/) website and download the installer.
 
