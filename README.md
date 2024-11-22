@@ -23,7 +23,26 @@ The SpaceX Starlink network is currently the most extensive and technologically 
 
 ## Getting Started
 
-To get started with this project, ensure you have Python installed, along with the required packages outlined in the `requirements.txt` file. The repository is set up to handle TLE data, calculate satellite coverage, and assess spatial overlap.
+To get started with this project, ensure you have Python installed.
+
+### Python Installation
+This project requires Python 3.9 or 3.10. You can download and install Python for:
+
+Windows: Visit the [Python](https://www.python.org/downloads/) website and download the installer.
+
+macOS: Using Homebrew: 
+```bash
+brew install python@3.9
+```
+Linux: Most distributions come with Python pre-installed. If not, use your package manager: 
+```bash
+# Ubuntu/Debian:
+sudo apt-get install python3.9
+```
+```bash
+# Fedora: 
+sudo dnf install python3.9
+```
 
 ## Features
 
