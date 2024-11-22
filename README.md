@@ -66,56 +66,21 @@ sudo dnf install python3.9
     ```bash
     pip install -r requirements.txt
     ```
-
-   **Note:** The repository requires external libraries, including:
-   - `pandas`
-   - `numpy`
-   - `requests`
-   - `pyorbital`
-   - `shapely`
-   - `geopandas`
-   - `scikit-learn`
-   - `networkx`
+    The required librabries to preprocess the TLE data and run the local search algorithms would be installed. 
+    
+    Note: It is recommended to use a virtual environment to install the libraries to prevent any discrepancies with the existing libraries on your system.
 
 ## Usage
 
 ### Download and Process TLE Data
 
-To download the latest TLE data and store it in a DataFrame:
+To download the latest TLE data and store it as a GeoDataFrame:
 
 ```python
-from tle_processing import download_tle_data_to_dataframe
+import tle_processing as tlp
 
-url = "https://celestrak.org/NORAD/elements/supplemental/sup-gp.php?FILE=starlink&FORMAT=tle"
-df = download_tle_data_to_dataframe(url)
-print(df.head())
+# Download and convert TLE data to GeoDataFrame for existing satellites
+current_tle = tlp.download_current_tles_as_list()
+tle_df = tlp.tles_to_dataframe(raw_tle_list=current_tle)
+satellite_gdf = tlp.tle_dataframe_to_geodataframe(tle_df)
 ```
-
-### Calculate Inter-Satellite Distance
-
-Given two satellite positions, the calculate distance script calculates the Cartesian (Euclidean) distance between two satellites in Earth-Centered, Earth-Fixed (ECEF) coordinates.
-
-```python
-from satellite_distance import calculate_distance
-
-# Example positions in Latitude, Longitude, and Altitude format
-position1 = (550, 53, 0)    # Satellite 1's position
-position2 = (540, 50, 20)   # Satellite 2's position
-
-# Calculate the distance between two satellites
-distance = calculate_distance(position1, position2)
-```
-
-### Compute Unique Coverage Area
-
-To calculate the unique coverage area:
-
-```python
-from calculateUniqueCA_NEW import calculate_unique_coverage_area
-
-# Assuming 'df' is your DataFrame with columns: 'Satellite Name', 'Latitude', 'Longitude', and 'Coverage Area (km^2)'
-unique_coverage_area = calculate_unique_coverage_area(df)
-print(f"Total unique coverage area: {unique_coverage_area} km²")
-```
-
-This function uses BallTree spatial indexing to compute unique coverage areas by grouping overlapping satellites and calculating the union of their coverage areas.
