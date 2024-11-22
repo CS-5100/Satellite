@@ -23,7 +23,7 @@ The SpaceX Starlink network is currently the most extensive and technologically 
 ## Local Search
 
 1. Hill Climbing:  
-Hill climbing is a local search algorithm that helps find the best solution to a given problem. The process is analogous to climbing a hill where you continually seek to improve your position until you reach the peak, or maxima.  
+This is a local search algorithm that helps find the best solution to a given problem. The process is analogous to climbing a hill where you continually seek to improve your position until you reach the peak, or maxima.  
 Algorithm:
     - Initial State: Start with an arbitrary or random solution.
     - Neighboring States: Identify neighboring states of the current solution by making small adjustments.
@@ -31,7 +31,7 @@ Algorithm:
     - Termination: Repeat this process until no neighboring state is better than the current one or the maximum number of iterations have been reached. At this point, you’ve reached a local optimum.
 
 2. Simulated Annealing:   
-Simulated Annealing draws inspiration from metallurgical processes, where metals are heated to a high temperature and then gradually cooled to remove defects and optimize their crystal structure.  
+This algorithm draws inspiration from metallurgical processes, where metals are heated to a high temperature and then gradually cooled to remove defects and optimize their crystal structure.  
 Algorithm:
     - Initial State: Start with an arbitrary or random solution.
     - Neighboring States: Identify neighboring states of the current solution by making small adjustments.
@@ -44,13 +44,15 @@ Algorithm:
 
 To get started with this project, ensure you have Python installed. This project requires Python 3.9 or 3.10. You can download and install Python for:
 
-Windows: Visit the [Python](https://www.python.org/downloads/) website and download the installer.
+`windows`: Visit the [Python](https://www.python.org/downloads/) website and download the installer.
 
-macOS: Using Homebrew: 
+`macOS`: 
 ```bash
+# Using Homebrew
 brew install python@3.9
 ```
-Linux: Most distributions come with Python pre-installed. If not, use your package manager: 
+`Linux`:  
+Most distributions come with Python pre-installed. If not, use your package manager: 
 ```bash
 # Ubuntu/Debian:
 sudo apt-get install python3.9
