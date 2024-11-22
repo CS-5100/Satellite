@@ -10,8 +10,6 @@ The repository contains a set of tools aimed at optimizing the placing of the St
 - [Installation](#installation)
 - [Usage](#usage)
   - [Download and Process TLE Data](#download-and-process-tle-data)
-  - [Calculate Inter-Satellite Distance](#calculate-inter-satellite-distance)
-  - [Compute Unique Coverage Area](#compute-unique-coverage-area)
 - [Files](#files)
 - [Contributing](#contributing)
 - [License](#license)
@@ -20,6 +18,16 @@ The repository contains a set of tools aimed at optimizing the placing of the St
 ## Project Overview
 
 The SpaceX Starlink network is currently the most extensive and technologically advanced satellite constellation in low earth orbit, offering high-speed, low-latency broadband internet worldwide. This work focuses on improving the performance of Starlink by solving the optimization problem of satellite positioning to achieve maximum area coverage.
+
+## Local Search
+
+1. Hill Climbing:  
+Hill climbing is a local search algorithm that helps find the best solution to a given problem. The process is analogous to climbing a hill where you continually seek to improve your position until you reach the peak, or maxima.  
+  Algorithm:
+    - Initial State: Start with an arbitrary or random solution.
+    - Neighboring States: Identify neighboring states of the current solution by making small adjustments.
+    - Move to Neighbor: If one of the neighboring states offers a better solution (according to some evaluation function), move to this new state.
+    - Termination: Repeat this process until no neighboring state is better than the current one or the maximum number of iterations have been reached. At this point, you’ve reached a local maximum or minimum (depending on whether you’re maximizing or minimizing).
 
 ## Getting Started
 
@@ -68,7 +76,7 @@ sudo dnf install python3.9
     ```
     The required librabries to preprocess the TLE data and run the local search algorithms would be installed. 
     
-    Note: It is recommended to use a virtual environment to install the libraries to prevent any discrepancies with the existing libraries on your system.
+    > **Note**: It is recommended to use a virtual environment to install the libraries to prevent any discrepancies with the existing libraries on your system.
 
 ## Usage
 
