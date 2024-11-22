@@ -9,7 +9,6 @@ The repository contains a set of tools aimed at optimizing the placing of the St
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
-  - [Download and Process TLE Data](#download-and-process-tle-data)
 - [Files](#files)
 - [Contributing](#contributing)
 - [License](#license)
@@ -17,7 +16,9 @@ The repository contains a set of tools aimed at optimizing the placing of the St
 ---
 ## Project Overview
 
-The SpaceX Starlink network is currently the most extensive and technologically advanced satellite constellation in low earth orbit, offering high-speed, low-latency broadband internet worldwide. This work focuses on improving the performance of Starlink by solving the optimization problem of satellite positioning to achieve maximum area coverage.
+Low Earth Orbit (LEO) satellites operate at altitudes between 100-1,200 miles above Earth's surface, enabling global communications with reduced signal latency and higher data transfer speeds compared to traditional satellites. However, these satellites face certain limitations - their relatively short operational lifespan of approximately 7-10 years5, requiring frequent replacements to maintain network coverage.  
+
+The SpaceX Starlink network is currently the most extensive and technologically advanced satellite constellation in low earth orbit, offering high-speed, low-latency broadband internet worldwide. This project addresses the optimization of satellite placement in the Starlink constellation to achieve maximum area coverage.
 
 ## Local Search
 
@@ -35,8 +36,8 @@ Algorithm:
     - Initial State: Start with an arbitrary or random solution.
     - Neighboring States: Identify neighboring states of the current solution by making small adjustments.
     - Move to Neighbor: If one of the neighboring states offers a better solution (higher energy, based on an objective), move to this new state. If not, then compute the probability of accepting a low energy solution using:  
-    $e^{\frac{\Delta E}{T}} < random(0, 1)$  
-    where ${\Delta E}$ represents the difference in energy between the current and the neighbouring state, and $T$ is the temperature. $T$ decays over using a decay factor $d \in (0,1)$.
+    $e^{\frac{\Delta E}{T}} < random (0, 1)$  
+    where ${\Delta E}$ represents the difference in energy between the current and the neighbouring state, and $T$ is the temperature. $T$ decays over time using a decay factor $d \in (0,1)$.
     - Termination: Repeat this process until no neighboring state is better than the current one or the maximum number of iterations have been reached. At this point, you’ve reached a local optimum.
 
 ## Getting Started
@@ -61,11 +62,7 @@ sudo dnf install python3.9
 
 ## Features
 
-1. **TLE Download and Conversion**: Download TLE data for satellite constellations, such as Starlink, directly from CelesTrak and convert it into a structured pandas DataFrame.
-2. **Satellite Position Calculation**: Calculate real-time latitude, longitude, and altitude of satellites using TLE data.
-3. **Coverage Area Calculation**: 
-   - **Total Coverage Area**: Computes coverage radius and area based on latitude, longitude, and altitude.
-   - **Unique Coverage Area**: Uses BallTree spatial indexing to determine overlapping satellites, calculating the union of all coverage areas to avoid double-counting.
+1. **TLE Download and Conversion**: Download TLE data for satellite constellations, such as Starlink, directly from CelesTrak either as a text file, or live using the code provided [here](#download-and-process-tle-data). 
 
 ## Installation
 
