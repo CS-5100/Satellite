@@ -1,4 +1,3 @@
-# Import necessary libraries
 import pandas as pd
 import numpy as np
 from pathlib import Path
@@ -6,8 +5,8 @@ import geopandas as gpd
 from shapely.geometry import Point
 import tle_processing as tlp 
 from random import uniform
-from search_functions import random_restart_simulated_annealing  # Import the simulated annealing function
-from geodataframe_processing import calculate_land_coverage  # Import calculate_land_coverage
+from search_functions import random_restart_simulated_annealing  
+from geodataframe_processing import calculate_land_coverage  
 
 # Constants
 BUFFER_RADIUS = 121065  # Approximate coverage radius of a satellite (in meters)
@@ -108,7 +107,5 @@ def calculate_average_added_coverage_simulated_annealing(
     print(f"Average Added Coverage over {num_runs} runs: {average_added_coverage:.2f} km²")
     return average_added_coverage
 
-# Example Usage
-if __name__ == "__main__":
-    average_coverage = calculate_average_added_coverage_simulated_annealing()
-    print(f"Calculated Average Added Coverage with Simulated Annealing: {average_coverage:.2f} km²")
+average_coverage = calculate_average_added_coverage_simulated_annealing()
+print(f"Calculated Average Added Coverage with Simulated Annealing: {average_coverage:.2f} km²")
