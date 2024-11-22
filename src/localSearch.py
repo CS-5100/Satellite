@@ -20,7 +20,7 @@ EQUAL_AREA_EPSG = 6933
 
 # Global Parameters
 PLOT = True
-BUFFER_RADIUS = 12065
+BUFFER_RADIUS = 121065
 PERTURB_DISTANCE_KM = (
     500  # we may want to make this something that decays exponentially
 )
