@@ -23,11 +23,21 @@ The SpaceX Starlink network is currently the most extensive and technologically 
 
 1. Hill Climbing:  
 Hill climbing is a local search algorithm that helps find the best solution to a given problem. The process is analogous to climbing a hill where you continually seek to improve your position until you reach the peak, or maxima.  
-  Algorithm:
+Algorithm:
     - Initial State: Start with an arbitrary or random solution.
     - Neighboring States: Identify neighboring states of the current solution by making small adjustments.
-    - Move to Neighbor: If one of the neighboring states offers a better solution (according to some evaluation function), move to this new state.
-    - Termination: Repeat this process until no neighboring state is better than the current one or the maximum number of iterations have been reached. At this point, you’ve reached a local maximum or minimum (depending on whether you’re maximizing or minimizing).
+    - Move to Neighbor: If one of the neighboring states offers a better solution (based on an objective function), move to this new state.
+    - Termination: Repeat this process until no neighboring state is better than the current one or the maximum number of iterations have been reached. At this point, you’ve reached a local optimum.
+
+2. Simulated Annealing:   
+Simulated Annealing draws inspiration from metallurgical processes, where metals are heated to a high temperature and then gradually cooled to remove defects and optimize their crystal structure.  
+Algorithm:
+    - Initial State: Start with an arbitrary or random solution.
+    - Neighboring States: Identify neighboring states of the current solution by making small adjustments.
+    - Move to Neighbor: If one of the neighboring states offers a better solution (higher energy, based on an objective), move to this new state. If not, then compute the probability of accepting a low energy solution using:  
+    $e^{\frac{\Delta E}{T}} < random(0, 1)$  
+    where ${\Delta E}$ represents the difference in energy between the current and neighbouring states, and $T$ is the temperature.
+    - Termination: Repeat this process until no neighboring state is better than the current one or the maximum number of iterations have been reached. At this point, you’ve reached a local optimum.
 
 ## Getting Started
 
@@ -74,9 +84,9 @@ sudo dnf install python3.9
     ```bash
     pip install -r requirements.txt
     ```
-    The required librabries to preprocess the TLE data and run the local search algorithms would be installed. 
+    Installs required librabries to preprocess the TLE data and run the local search algorithms. 
     
-    > **Note**: It is recommended to use a virtual environment to install the libraries to prevent any discrepancies with the existing libraries on your system.
+    > **Note**: It is recommended to use a [virtual environment](https://docs.python.org/3/library/venv.html) to install the libraries to prevent any discrepancies with the existing libraries on your system.
 
 ## Usage
 
