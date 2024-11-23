@@ -2,9 +2,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
+from scipy.stats import mannwhitneyu, median_abs_deviation
 from datetime import datetime
-from pathlib import Path
-from scipy.stats import median_abs_deviation
 from geodataframe_processing import (
     load_satellites_from_file,
     load_land_ocean_data,
@@ -271,81 +270,119 @@ def generate_episodes_rrsa(
 
 
 # running the loops for each algorithm
-(
-    hc_durations,
-    hc_total_coverage,
-    hc_added_coverage_above_existing,
-    hc_added_coverage_above_initial,
-    hc_percent_coverage,
-    hc_percent_above_existing,
-    hc_percent_above_initial,
-    hc_coverage_lists,
-) = generate_episodes_hc(
-    existing_satellite_gdf=base_gdf,
-    equal_area_epsg=EQUAL_AREA_EPSG,
-    equal_distance_epsg=EQUAL_DISTANCE_EPSG,
-    input_map=land_map,
-    perturb_dist=PERTURB_DISTANCE_KM,
-    num_episodes=NUMBER_EPISODES,
-    ls_iter=LOCAL_SEARCH_ITERATIONS,
+# (
+#     hc_durations,
+#     hc_total_coverage,
+#     hc_added_coverage_above_existing,
+#     hc_added_coverage_above_initial,
+#     hc_percent_coverage,
+#     hc_percent_above_existing,
+#     hc_percent_above_initial,
+#     hc_coverage_lists,
+# ) = generate_episodes_hc(
+#     existing_satellite_gdf=base_gdf,
+#     equal_area_epsg=EQUAL_AREA_EPSG,
+#     equal_distance_epsg=EQUAL_DISTANCE_EPSG,
+#     input_map=land_map,
+#     perturb_dist=PERTURB_DISTANCE_KM,
+#     num_episodes=NUMBER_EPISODES,
+#     ls_iter=LOCAL_SEARCH_ITERATIONS,
+# )
+
+# (
+#     rrsa_durations,
+#     rrsa_total_coverage,
+#     rrsa_added_coverage_above_existing,
+#     rrsa_added_coverage_above_initial,
+#     rrsa_percent_coverage,
+#     rrsa_percent_above_existing,
+#     rrsa_percent_above_initial,
+#     rrsa_coverage_lists,
+# ) = generate_episodes_rrsa(
+#     existing_satellite_gdf=base_gdf,
+#     equal_area_epsg=EQUAL_AREA_EPSG,
+#     equal_distance_epsg=EQUAL_DISTANCE_EPSG,
+#     input_map=land_map,
+#     perturb_dist=PERTURB_DISTANCE_KM,
+#     num_episodes=NUMBER_EPISODES,
+#     ls_iter=LOCAL_SEARCH_ITERATIONS,
+# )
+
+
+# hc_dict = {
+#     "Duration": hc_durations,
+#     "Total_Coverage": hc_total_coverage,
+#     "Coverage_Above_Existing": hc_added_coverage_above_existing,
+#     "Coverage_Above_Initial": hc_added_coverage_above_initial,
+#     "Percent_Coverage": hc_percent_coverage,
+#     "Percent_Coverage_Above_Existing": hc_percent_above_existing,
+#     "Percent_Coverage_Above_Initial": hc_percent_above_initial,
+# }
+
+# rrsa_dict = {
+#     "Duration": rrsa_durations,
+#     "Total_Coverage": rrsa_total_coverage,
+#     "Coverage_Above_Existing": rrsa_added_coverage_above_existing,
+#     "Coverage_Above_Initial": rrsa_added_coverage_above_initial,
+#     "Percent_Coverage": rrsa_percent_coverage,
+#     "Percent_Coverage_Above_Existing": rrsa_percent_above_existing,
+#     "Percent_Coverage_Above_Initial": rrsa_percent_above_initial,
+# }
+
+# hc_df = pd.DataFrame(hc_dict)
+# hc_df["Algorithm"] = "First-Choice Hill Climbing"
+
+# rrsa_df = pd.DataFrame(rrsa_dict)
+# rrsa_df["Algorithm"] = "Random Restart Hill Climbing with Simulated Annealing"
+
+# hc_episode_df = pd.DataFrame(data=hc_coverage_lists)
+# rrsa_episode_df = pd.DataFrame(data=rrsa_coverage_lists)
+
+# df = pd.concat([hc_df, rrsa_df])
+# summary_filename = (
+#     "Distribution_"
+#     + str(NUMBER_EPISODES)
+#     + "episodes_"
+#     + str(LOCAL_SEARCH_ITERATIONS)
+#     + "iterations.csv"
+# )
+
+# df.to_csv(summary_filename)
+# hc_episode_df.to_csv("hc_episodes.csv")
+# rrsa_episode_df.to_csv("rrsa_episodes.csv")
+
+df_2 = pd.read_csv("Distribution_30episodes_200iterations.csv")
+hc_df_2 = df_2[df_2["Algorithm"] == "First-Choice Hill Climbing"]
+rrsa_df_2 = df_2[
+    df_2["Algorithm"] == "Random Restart Hill Climbing with Simulated Annealing"
+]
+
+hc_durations = hc_df_2.iloc[:, 1]
+hc_total_coverage = hc_df_2.iloc[:, 2]
+hc_added_coverage_above_existing = hc_df_2.iloc[:, 3]
+hc_added_coverage_above_initial = hc_df_2.iloc[:, 4]
+hc_percent_coverage = hc_df_2.iloc[:, 5]
+hc_percent_above_existing = hc_df_2.iloc[:, 6]
+hc_percent_above_initial = hc_df_2.iloc[:, 7]
+
+rrsa_durations = rrsa_df_2.iloc[:, 1]
+rrsa_total_coverage = rrsa_df_2.iloc[:, 2]
+rrsa_added_coverage_above_existing = rrsa_df_2.iloc[:, 3]
+rrsa_added_coverage_above_initial = rrsa_df_2.iloc[:, 4]
+rrsa_percent_coverage = rrsa_df_2.iloc[:, 5]
+rrsa_percent_above_existing = rrsa_df_2.iloc[:, 6]
+rrsa_percent_above_initial = rrsa_df_2.iloc[:, 7]
+
+print(
+    "Median, First-Choice Hill Climbing: {:.2e} +- {:.2e}".format(
+        np.median(hc_added_coverage_above_initial), median_abs_deviation(hc_added_coverage_above_initial)
+    )
 )
-
-(
-    rrsa_durations,
-    rrsa_total_coverage,
-    rrsa_added_coverage_above_existing,
-    rrsa_added_coverage_above_initial,
-    rrsa_percent_coverage,
-    rrsa_percent_above_existing,
-    rrsa_percent_above_initial,
-    rrsa_coverage_lists,
-) = generate_episodes_rrsa(
-    existing_satellite_gdf=base_gdf,
-    equal_area_epsg=EQUAL_AREA_EPSG,
-    equal_distance_epsg=EQUAL_DISTANCE_EPSG,
-    input_map=land_map,
-    perturb_dist=PERTURB_DISTANCE_KM,
-    num_episodes=NUMBER_EPISODES,
-    ls_iter=LOCAL_SEARCH_ITERATIONS,
+print(
+    "Median, Random Restart Hill Climbing with Simulated Annealing: {:.2e} +- {:.2e}".format(
+        np.median(rrsa_added_coverage_above_initial), median_abs_deviation(rrsa_added_coverage_above_initial)
+    )
 )
-
-
-hc_dict = {
-    "Duration": hc_durations,
-    "Total_Coverage": hc_total_coverage,
-    "Coverage_Above_Existing": hc_added_coverage_above_existing,
-    "Coverage_Above_Initial": hc_added_coverage_above_initial,
-    "Percent_Coverage": hc_percent_coverage,
-    "Percent_Coverage_Above_Existing": hc_percent_above_existing,
-    "Percent_Coverage_Above_Initial": hc_percent_above_initial,
-}
-
-rrsa_dict = {
-    "Duration": rrsa_durations,
-    "Total_Coverage": rrsa_total_coverage,
-    "Coverage_Above_Existing": rrsa_added_coverage_above_existing,
-    "Coverage_Above_Initial": rrsa_added_coverage_above_initial,
-    "Percent_Coverage": rrsa_percent_coverage,
-    "Percent_Coverage_Above_Existing": rrsa_percent_above_existing,
-    "Percent_Coverage_Above_Initial": rrsa_percent_above_initial,
-}
-
-hc_df = pd.DataFrame(hc_dict)
-hc_df["Algorithm"] = "First-Choice Hill Climbing"
-
-rrsa_df = pd.DataFrame(rrsa_dict)
-rrsa_df["Algorithm"] = "Random Restart Hill Climbing with Simulated Annealing"
-
-df = pd.concat([hc_df, rrsa_df])
-filename = (
-    "Distribution_"
-    + str(NUMBER_EPISODES)
-    + "episodes_"
-    + str(LOCAL_SEARCH_ITERATIONS)
-    + "iterations.csv"
-)
-
-df.to_csv(filename)
 
 
 def plot_episode_lists(
@@ -375,7 +412,11 @@ def plot_episode_lists(
         color="blue",
         label="Random Restart Hill Climbing +\nSimulated Annealing",
     )
-    ax.legend(handles=[orange_line_handle, blue_line_handle], fontsize="x-small")
+    ax.legend(
+        handles=[orange_line_handle, blue_line_handle],
+        fontsize="x-small",
+        loc="lower right",
+    )
     ax.set_xlabel("Local Search Iterations")
     ax.set_ylabel("Coverage Area, Square Kilometers")
     plt.title(title)
@@ -395,11 +436,16 @@ def violin_plot_compare(
 
     colors = ["orange", "blue"]
 
+    _, p = mannwhitneyu(hc_parameter, rrsa_parameter)
+    p_value = "Two Sided p Value: {:.2e}".format(p)
+
     plot_data = [hc_parameter, rrsa_parameter]
 
-    hc_x_var = [1 for i in range(len(hc_parameter))]
-    rrsa_x_var = [2 for i in range(len(rrsa_parameter))]
+    hc_x_var = [1 for _ in range(len(hc_parameter))]
+    rrsa_x_var = [2 for _ in range(len(rrsa_parameter))]
     x_var = hc_x_var + rrsa_x_var
+
+    quartile1, _, quartile3 = np.percentile(plot_data, [25, 50, 75], axis=1)
 
     ax.set_xticks(
         [y + 1 for y in range(len(plot_data))],
@@ -408,14 +454,22 @@ def violin_plot_compare(
             "Random Restart Hill Climbing +\nSimulated Annealing",
         ],
     )
-
-    ax.set_xlabel("Local Search Algorithm")
+    
     ax.set_ylabel(y_label)
+    ax.text(
+        0.5,
+        0.05,
+        p_value,
+        transform=ax.transAxes,
+        horizontalalignment="center",
+        verticalalignment="bottom",
+    )
 
     ax.set_title(title)
-    ax.scatter(x_var, plot_data, marker="o")
+    ax.scatter(x_var, plot_data, marker="o", color="black", zorder=2.5)
+    ax.vlines(np.array([1, 2]), quartile1, quartile3, color=colors, linestyle="-", lw=5)
 
-    violin_plot_parts = ax.violinplot(plot_data, showmeans=False, showmedians=True)
+    violin_plot_parts = ax.violinplot(plot_data, showmedians=True, showextrema=False)
 
     for i, pc in enumerate(violin_plot_parts["bodies"]):
         pc.set_color(colors[i])
@@ -423,12 +477,12 @@ def violin_plot_compare(
     return fig
 
 
-episode_iterations = plot_episode_lists(
-    hc_lists=hc_coverage_lists,
-    rrsa_lists=rrsa_coverage_lists,
-    iterations=LOCAL_SEARCH_ITERATIONS,
-    title="Coverage Area Versus Iteration",
-)
+# episode_iterations = plot_episode_lists(
+#     hc_lists=hc_coverage_lists,
+#     rrsa_lists=rrsa_coverage_lists,
+#     iterations=LOCAL_SEARCH_ITERATIONS,
+#     title="Coverage Area Versus Iteration",
+# )
 
 duration_distributions = violin_plot_compare(
     hc_parameter=hc_durations,
@@ -458,23 +512,23 @@ percent_coverage_distributions = violin_plot_compare(
     hc_parameter=hc_percent_coverage,
     rrsa_parameter=rrsa_percent_coverage,
     y_label="Percent Earth Land Area, Total",
-    title="Empirical Distribution of\nTotal Coverage Areas",
+    title="Empirical Distribution of\nTotal Earth Coverage Percent",
 )
-coverage_above_existing_distributions = violin_plot_compare(
+percent_coverage_above_existing_distributions = violin_plot_compare(
     hc_parameter=hc_percent_above_existing,
     rrsa_parameter=rrsa_percent_above_existing,
     y_label="Percent Earth Land Area, Added",
-    title="Empirical Distribution of\nAdded Coverage Areas Above Existing",
+    title="Empirical Distribution of\nAdded Earth Coverage Percent Above Existing",
 )
-coverage_above_initial_distributions = violin_plot_compare(
+percent_coverage_above_initial_distributions = violin_plot_compare(
     hc_parameter=hc_percent_above_initial,
     rrsa_parameter=rrsa_percent_above_initial,
     y_label="Percent Earth Land Area, Added",
-    title="Empirical Distribution of\nAdded Coverage Areas Above Initial Configuration",
+    title="Empirical Distribution of\nAdded Earth Coverage Percent Above Initial Configuration",
 )
 
 
-episode_iterations.savefig("episode_iterations.png")
+# episode_iterations.savefig("episode_iterations.png")
 duration_distributions.savefig("duration_distributions.png")
 coverage_distributions.savefig("coverage_distributions.png")
 coverage_above_existing_distributions.savefig(
@@ -482,9 +536,11 @@ coverage_above_existing_distributions.savefig(
 )
 coverage_above_initial_distributions.savefig("coverage_above_initial_distributions.png")
 percent_coverage_distributions.savefig("percent_coverage_distributions.png")
-coverage_above_existing_distributions.savefig(
-    "coverage_above_existing_distributions.png"
+percent_coverage_above_existing_distributions.savefig(
+    "percent_coverage_above_existing_distributions.png"
 )
-coverage_above_initial_distributions.savefig("coverage_above_initial_distributions.png")
+percent_coverage_above_initial_distributions.savefig(
+    "percent_coverage_above_initial_distributions.png"
+)
 
 plt.show()
