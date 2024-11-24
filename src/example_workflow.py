@@ -15,7 +15,7 @@ EQUAL_AREA_EPSG = 6933
 BASE_BUFFER = 12065
 TLE_TIME = datetime(2024, 11, 14, 16, 12, 32, 202983)
 PERTURB_DISTANCE_KM = 100
-LOCAL_SEARCH_ITERATIONS = 200
+LOCAL_SEARCH_ITERATIONS = 1
 
 
 # Importing a set of TLEs as the existing satellites
@@ -54,16 +54,27 @@ optimized_gdf, _, _, _ = random_restart_simulated_annealing(
     equal_distance_epsg=EQUAL_DISTANCE_EPSG,
     equal_area_epsg=EQUAL_AREA_EPSG,
     perturbation_distance=PERTURB_DISTANCE_KM,
-    num_iterations=100,
+    num_iterations=LOCAL_SEARCH_ITERATIONS,
 )
 
 # get the optimized candidate satellite positions
 final_gdf = optimized_gdf[optimized_gdf["new_satellite"] == True]
 
 # make and show the before and after plot
-before_after_plot = plot_initial_final_satellites(existing_satellites=existing_gdf,
-                                                  initial_positions=initial_gdf,
-                                                  final_positions=final_gdf,
-                                                  land=land_map,
-                                                  ocean=ocean_map)
+# before_after_plot = plot_initial_final_satellites(existing_satellites=existing_gdf,
+#                                                   initial_positions=initial_gdf,
+#                                                   final_positions=final_gdf,
+#                                                   land=land_map,
+#                                                   ocean=ocean_map)
+
+# plotting for presentation
+fig, ax = plt.subplots()
+land_map.plot(ax=ax, color="#228B22")
+ocean_map.plot(ax=ax, color="#246BCE")
+base_gdf.plot(ax=ax, color="#0E0E10", markersize=1)  # Jet Black
+# the below color is apparently known as International Orange (Aerospace) and used in the aerospace industry
+initial_gdf.plot(ax=ax, color="#FF4F00", markersize=10)
+
+fig.savefig("world_plot.png", bbox_inches='tight')
+
 plt.show()

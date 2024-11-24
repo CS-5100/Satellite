@@ -683,7 +683,7 @@ durations_versus_buffer = plot_for_sensitivity_analysis(
     rrsa_parameter=rrsa_average_durations,
     rrsa_error=rrsa_median_absolute_deviation_duration,
     y_label="Duration,\nMinutes",
-    ymax=20,
+    ymax=13,
     title="Runtime Duration as a Function of Coverage Radius",
 )
 total_coverage_versus_buffer = plot_for_sensitivity_analysis(
