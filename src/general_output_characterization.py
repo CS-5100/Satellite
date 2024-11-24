@@ -352,7 +352,7 @@ df.to_csv(summary_filename)
 hc_episode_df.to_csv("hc_episodes.csv")
 rrsa_episode_df.to_csv("rrsa_episodes.csv")
 
-# df_2 = pd.read_csv("Distribution_30episodes_200iterations.csv")
+# df_2 = pd.read_csv("Distribution_50episodes_200iterations.csv")
 # hc_df_2 = df_2[df_2["Algorithm"] == "First-Choice Hill Climbing"]
 # rrsa_df_2 = df_2[
 #     df_2["Algorithm"] == "Random Restart Hill Climbing with Simulated Annealing"
@@ -384,6 +384,19 @@ rrsa_episode_df.to_csv("rrsa_episodes.csv")
 #         np.median(rrsa_added_coverage_above_initial), median_abs_deviation(rrsa_added_coverage_above_initial)
 #     )
 # )
+
+hc_episodes_df = pd.read_csv("hc_episodes.csv", index_col=0)
+rrsa_episodes_df = pd.read_csv("rrsa_episodes.csv", index_col=0)
+
+hc_episodes_col_average = hc_episodes_df.apply(np.mean, axis=0)
+hc_episodes_col_mad = hc_episodes_df.apply(median_abs_deviation, axis=0)
+
+rrsa_episodes_col_average = rrsa_episodes_df.apply(np.mean, axis=0)
+rrsa_episodes_col_mad = rrsa_episodes_df.apply(median_abs_deviation, axis=0)
+
+hc_coverage_lists = hc_episodes_df.values.tolist()
+rrsa_coverage_lists = rrsa_episodes_df.values.tolist()
+
 procedure_end = time.time()
 procedure_duration_seconds = procedure_end - procedure_start
 procedure_duration_minutes = procedure_duration_seconds / 60.0
@@ -404,10 +417,10 @@ def plot_episode_lists(
     x_values = [i for i in range(1, iterations + 1)]
 
     for y_list in hc_lists:
-        ax.plot(x_values, y_list, color="orange")
+        ax.plot(x_values, y_list, color="orange", alpha = 0.5)
 
     for y_list in rrsa_lists:
-        ax.plot(x_values, y_list, color="blue")
+        ax.plot(x_values, y_list, color="blue", alpha = 0.5)
 
     orange_line_handle = mlines.Line2D(
         [], [], color="orange", label="First-Choice Hill Climbing"
@@ -426,6 +439,47 @@ def plot_episode_lists(
     ax.set_xlabel("Local Search Iterations")
     ax.set_ylabel("Coverage Area, Square Kilometers")
     plt.title(title)
+
+    return fig
+
+
+def plot_episode_average(
+    hc_median,
+    hc_mad,
+    rrsa_median,
+    rrsa_mad,
+    iterations
+):
+
+    # create the figure
+    fig, ax = plt.subplots()
+
+    x_values = [i for i in range(1, iterations + 1)]
+
+    hc_line = ax.errorbar(
+        x=x_values,
+        y=hc_median,
+        yerr=hc_mad,
+        color="orange",
+        label="First-Choice Hill Climbing",
+        fmt='o-',
+        alpha = 0.5
+    )
+
+    rrsa_line = ax.errorbar(
+        x=x_values,
+        y=rrsa_median,
+        yerr=rrsa_mad,
+        color="blue",
+        label="Random Restart Hill Climbing +\nSimulated Annealing",
+        fmt='o-',
+        alpha = 0.5
+    )
+
+    ax.legend(handles=[hc_line, rrsa_line], fontsize="x-small")
+    ax.set_ylabel("Coverage Radius, Kilometers")
+    ax.set_xlabel("Local Search Iterations")
+    plt.title("Episode Coverage Area Medians")
 
     return fig
 
@@ -490,6 +544,14 @@ episode_iterations = plot_episode_lists(
     title="Coverage Area Versus Iteration",
 )
 
+episode_averages = plot_episode_average(
+    hc_median=hc_episodes_col_average,
+    hc_mad=hc_episodes_col_mad,
+    rrsa_median=rrsa_episodes_col_average,
+    rrsa_mad=rrsa_episodes_col_mad,
+    iterations=LOCAL_SEARCH_ITERATIONS
+)
+
 duration_distributions = violin_plot_compare(
     hc_parameter=hc_durations,
     rrsa_parameter=rrsa_durations,
@@ -535,6 +597,7 @@ percent_coverage_above_initial_distributions = violin_plot_compare(
 
 
 episode_iterations.savefig("episode_iterations.png")
+episode_averages.savefig("episode_medians.png")
 duration_distributions.savefig("duration_distributions.png")
 coverage_distributions.savefig("coverage_distributions.png")
 coverage_above_existing_distributions.savefig(
