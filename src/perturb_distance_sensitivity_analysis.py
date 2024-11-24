@@ -754,18 +754,18 @@ percent_above_initial_versus_distance = plot_for_sensitivity_analysis(
 )
 plt.show()
 
-durations_versus_distance.savefig("durations_versus_distance.png")
-total_coverage_versus_distance.savefig("total_coverage_versus_distance.png")
+durations_versus_distance.savefig("durations_versus_distance.png", bbox_inches='tight')
+total_coverage_versus_distance.savefig("total_coverage_versus_distance.png", bbox_inches='tight')
 coverage_above_existing_versus_distance.savefig(
-    "coverage_above_existing_versus_distance.png"
+    "coverage_above_existing_versus_distance.png", bbox_inches='tight'
 )
 coverage_above_initial_versus_distance.savefig(
-    "coverage_above_initial_versus_distance.png"
+    "coverage_above_initial_versus_distance.png", bbox_inches='tight'
 )
-percent_coverage_versus_distance.savefig("percent_coverage_versus_distance.png")
+percent_coverage_versus_distance.savefig("percent_coverage_versus_distance.png", bbox_inches='tight')
 percent_above_existing_versus_distance.savefig(
-    "percent_above_existing_versus_distance.png"
+    "percent_above_existing_versus_distance.png", bbox_inches='tight'
 )
 percent_above_initial_versus_distance.savefig(
-    "percent_above_initial_versus_distance.png"
+    "percent_above_initial_versus_distance.png", bbox_inches='tight'
 )

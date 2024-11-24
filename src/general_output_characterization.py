@@ -271,119 +271,119 @@ def generate_episodes_rrsa(
 
 
 # running the loops for each algorithm
-(
-    hc_durations,
-    hc_total_coverage,
-    hc_added_coverage_above_existing,
-    hc_added_coverage_above_initial,
-    hc_percent_coverage,
-    hc_percent_above_existing,
-    hc_percent_above_initial,
-    hc_coverage_lists,
-) = generate_episodes_hc(
-    existing_satellite_gdf=base_gdf,
-    equal_area_epsg=EQUAL_AREA_EPSG,
-    equal_distance_epsg=EQUAL_DISTANCE_EPSG,
-    input_map=land_map,
-    perturb_dist=PERTURB_DISTANCE_KM,
-    num_episodes=NUMBER_EPISODES,
-    ls_iter=LOCAL_SEARCH_ITERATIONS,
-)
-
-(
-    rrsa_durations,
-    rrsa_total_coverage,
-    rrsa_added_coverage_above_existing,
-    rrsa_added_coverage_above_initial,
-    rrsa_percent_coverage,
-    rrsa_percent_above_existing,
-    rrsa_percent_above_initial,
-    rrsa_coverage_lists,
-) = generate_episodes_rrsa(
-    existing_satellite_gdf=base_gdf,
-    equal_area_epsg=EQUAL_AREA_EPSG,
-    equal_distance_epsg=EQUAL_DISTANCE_EPSG,
-    input_map=land_map,
-    perturb_dist=PERTURB_DISTANCE_KM,
-    num_episodes=NUMBER_EPISODES,
-    ls_iter=LOCAL_SEARCH_ITERATIONS,
-)
-
-
-hc_dict = {
-    "Duration": hc_durations,
-    "Total_Coverage": hc_total_coverage,
-    "Coverage_Above_Existing": hc_added_coverage_above_existing,
-    "Coverage_Above_Initial": hc_added_coverage_above_initial,
-    "Percent_Coverage": hc_percent_coverage,
-    "Percent_Coverage_Above_Existing": hc_percent_above_existing,
-    "Percent_Coverage_Above_Initial": hc_percent_above_initial,
-}
-
-rrsa_dict = {
-    "Duration": rrsa_durations,
-    "Total_Coverage": rrsa_total_coverage,
-    "Coverage_Above_Existing": rrsa_added_coverage_above_existing,
-    "Coverage_Above_Initial": rrsa_added_coverage_above_initial,
-    "Percent_Coverage": rrsa_percent_coverage,
-    "Percent_Coverage_Above_Existing": rrsa_percent_above_existing,
-    "Percent_Coverage_Above_Initial": rrsa_percent_above_initial,
-}
-
-hc_df = pd.DataFrame(hc_dict)
-hc_df["Algorithm"] = "First-Choice Hill Climbing"
-
-rrsa_df = pd.DataFrame(rrsa_dict)
-rrsa_df["Algorithm"] = "Random Restart Hill Climbing with Simulated Annealing"
-
-hc_episode_df = pd.DataFrame(data=hc_coverage_lists)
-rrsa_episode_df = pd.DataFrame(data=rrsa_coverage_lists)
-
-df = pd.concat([hc_df, rrsa_df])
-summary_filename = (
-    "Distribution_"
-    + str(NUMBER_EPISODES)
-    + "episodes_"
-    + str(LOCAL_SEARCH_ITERATIONS)
-    + "iterations.csv"
-)
-
-df.to_csv(summary_filename)
-hc_episode_df.to_csv("hc_episodes.csv")
-rrsa_episode_df.to_csv("rrsa_episodes.csv")
-
-# df_2 = pd.read_csv("Distribution_50episodes_200iterations.csv")
-# hc_df_2 = df_2[df_2["Algorithm"] == "First-Choice Hill Climbing"]
-# rrsa_df_2 = df_2[
-#     df_2["Algorithm"] == "Random Restart Hill Climbing with Simulated Annealing"
-# ]
-
-# hc_durations = hc_df_2.iloc[:, 1]
-# hc_total_coverage = hc_df_2.iloc[:, 2]
-# hc_added_coverage_above_existing = hc_df_2.iloc[:, 3]
-# hc_added_coverage_above_initial = hc_df_2.iloc[:, 4]
-# hc_percent_coverage = hc_df_2.iloc[:, 5]
-# hc_percent_above_existing = hc_df_2.iloc[:, 6]
-# hc_percent_above_initial = hc_df_2.iloc[:, 7]
-
-# rrsa_durations = rrsa_df_2.iloc[:, 1]
-# rrsa_total_coverage = rrsa_df_2.iloc[:, 2]
-# rrsa_added_coverage_above_existing = rrsa_df_2.iloc[:, 3]
-# rrsa_added_coverage_above_initial = rrsa_df_2.iloc[:, 4]
-# rrsa_percent_coverage = rrsa_df_2.iloc[:, 5]
-# rrsa_percent_above_existing = rrsa_df_2.iloc[:, 6]
-# rrsa_percent_above_initial = rrsa_df_2.iloc[:, 7]
-
-# print(
-#     "Median, First-Choice Hill Climbing: {:.2e} +- {:.2e}".format(
-#         np.median(hc_added_coverage_above_initial), median_abs_deviation(hc_added_coverage_above_initial)
-#     )
+# (
+#     hc_durations,
+#     hc_total_coverage,
+#     hc_added_coverage_above_existing,
+#     hc_added_coverage_above_initial,
+#     hc_percent_coverage,
+#     hc_percent_above_existing,
+#     hc_percent_above_initial,
+#     hc_coverage_lists,
+# ) = generate_episodes_hc(
+#     existing_satellite_gdf=base_gdf,
+#     equal_area_epsg=EQUAL_AREA_EPSG,
+#     equal_distance_epsg=EQUAL_DISTANCE_EPSG,
+#     input_map=land_map,
+#     perturb_dist=PERTURB_DISTANCE_KM,
+#     num_episodes=NUMBER_EPISODES,
+#     ls_iter=LOCAL_SEARCH_ITERATIONS,
 # )
-# print(
-#     "Median, Random Restart Hill Climbing with Simulated Annealing: {:.2e} +- {:.2e}".format(
-#         np.median(rrsa_added_coverage_above_initial), median_abs_deviation(rrsa_added_coverage_above_initial)
-#     )
+
+# (
+#     rrsa_durations,
+#     rrsa_total_coverage,
+#     rrsa_added_coverage_above_existing,
+#     rrsa_added_coverage_above_initial,
+#     rrsa_percent_coverage,
+#     rrsa_percent_above_existing,
+#     rrsa_percent_above_initial,
+#     rrsa_coverage_lists,
+# ) = generate_episodes_rrsa(
+#     existing_satellite_gdf=base_gdf,
+#     equal_area_epsg=EQUAL_AREA_EPSG,
+#     equal_distance_epsg=EQUAL_DISTANCE_EPSG,
+#     input_map=land_map,
+#     perturb_dist=PERTURB_DISTANCE_KM,
+#     num_episodes=NUMBER_EPISODES,
+#     ls_iter=LOCAL_SEARCH_ITERATIONS,
 # )
+
+
+# hc_dict = {
+#     "Duration": hc_durations,
+#     "Total_Coverage": hc_total_coverage,
+#     "Coverage_Above_Existing": hc_added_coverage_above_existing,
+#     "Coverage_Above_Initial": hc_added_coverage_above_initial,
+#     "Percent_Coverage": hc_percent_coverage,
+#     "Percent_Coverage_Above_Existing": hc_percent_above_existing,
+#     "Percent_Coverage_Above_Initial": hc_percent_above_initial,
+# }
+
+# rrsa_dict = {
+#     "Duration": rrsa_durations,
+#     "Total_Coverage": rrsa_total_coverage,
+#     "Coverage_Above_Existing": rrsa_added_coverage_above_existing,
+#     "Coverage_Above_Initial": rrsa_added_coverage_above_initial,
+#     "Percent_Coverage": rrsa_percent_coverage,
+#     "Percent_Coverage_Above_Existing": rrsa_percent_above_existing,
+#     "Percent_Coverage_Above_Initial": rrsa_percent_above_initial,
+# }
+
+# hc_df = pd.DataFrame(hc_dict)
+# hc_df["Algorithm"] = "First-Choice Hill Climbing"
+
+# rrsa_df = pd.DataFrame(rrsa_dict)
+# rrsa_df["Algorithm"] = "Random Restart Hill Climbing with Simulated Annealing"
+
+# hc_episode_df = pd.DataFrame(data=hc_coverage_lists)
+# rrsa_episode_df = pd.DataFrame(data=rrsa_coverage_lists)
+
+# df = pd.concat([hc_df, rrsa_df])
+# summary_filename = (
+#     "Distribution_"
+#     + str(NUMBER_EPISODES)
+#     + "episodes_"
+#     + str(LOCAL_SEARCH_ITERATIONS)
+#     + "iterations.csv"
+# )
+
+# df.to_csv(summary_filename)
+# hc_episode_df.to_csv("hc_episodes.csv")
+# rrsa_episode_df.to_csv("rrsa_episodes.csv")
+
+df_2 = pd.read_csv("Distribution_50episodes_200iterations.csv")
+hc_df_2 = df_2[df_2["Algorithm"] == "First-Choice Hill Climbing"]
+rrsa_df_2 = df_2[
+    df_2["Algorithm"] == "Random Restart Hill Climbing with Simulated Annealing"
+]
+
+hc_durations = hc_df_2.iloc[:, 1]
+hc_total_coverage = hc_df_2.iloc[:, 2]
+hc_added_coverage_above_existing = hc_df_2.iloc[:, 3]
+hc_added_coverage_above_initial = hc_df_2.iloc[:, 4]
+hc_percent_coverage = hc_df_2.iloc[:, 5]
+hc_percent_above_existing = hc_df_2.iloc[:, 6]
+hc_percent_above_initial = hc_df_2.iloc[:, 7]
+
+rrsa_durations = rrsa_df_2.iloc[:, 1]
+rrsa_total_coverage = rrsa_df_2.iloc[:, 2]
+rrsa_added_coverage_above_existing = rrsa_df_2.iloc[:, 3]
+rrsa_added_coverage_above_initial = rrsa_df_2.iloc[:, 4]
+rrsa_percent_coverage = rrsa_df_2.iloc[:, 5]
+rrsa_percent_above_existing = rrsa_df_2.iloc[:, 6]
+rrsa_percent_above_initial = rrsa_df_2.iloc[:, 7]
+
+print(
+    "Median, First-Choice Hill Climbing: {:.2e} +- {:.2e}".format(
+        np.median(hc_added_coverage_above_initial), median_abs_deviation(hc_added_coverage_above_initial)
+    )
+)
+print(
+    "Median, Random Restart Hill Climbing with Simulated Annealing: {:.2e} +- {:.2e}".format(
+        np.median(rrsa_added_coverage_above_initial), median_abs_deviation(rrsa_added_coverage_above_initial)
+    )
+)
 
 hc_episodes_df = pd.read_csv("hc_episodes.csv", index_col=0)
 rrsa_episodes_df = pd.read_csv("rrsa_episodes.csv", index_col=0)
@@ -477,7 +477,7 @@ def plot_episode_average(
     )
 
     ax.legend(handles=[hc_line, rrsa_line], fontsize="x-small")
-    ax.set_ylabel("Coverage Radius, Kilometers")
+    ax.set_ylabel("Coverage Radius, Square Kilometers")
     ax.set_xlabel("Local Search Iterations")
     plt.title("Episode Coverage Area Medians")
 
@@ -596,20 +596,20 @@ percent_coverage_above_initial_distributions = violin_plot_compare(
 )
 
 
-episode_iterations.savefig("episode_iterations.png")
-episode_averages.savefig("episode_medians.png")
-duration_distributions.savefig("duration_distributions.png")
-coverage_distributions.savefig("coverage_distributions.png")
+episode_iterations.savefig("episode_iterations.png", bbox_inches='tight')
+episode_averages.savefig("episode_medians.png", bbox_inches='tight')
+duration_distributions.savefig("duration_distributions.png", bbox_inches='tight')
+coverage_distributions.savefig("coverage_distributions.png", bbox_inches='tight')
 coverage_above_existing_distributions.savefig(
-    "coverage_above_existing_distributions.png"
+    "coverage_above_existing_distributions.png", bbox_inches='tight'
 )
-coverage_above_initial_distributions.savefig("coverage_above_initial_distributions.png")
-percent_coverage_distributions.savefig("percent_coverage_distributions.png")
+coverage_above_initial_distributions.savefig("coverage_above_initial_distributions.png", bbox_inches='tight')
+percent_coverage_distributions.savefig("percent_coverage_distributions.png", bbox_inches='tight')
 percent_coverage_above_existing_distributions.savefig(
-    "percent_coverage_above_existing_distributions.png"
+    "percent_coverage_above_existing_distributions.png", bbox_inches='tight'
 )
 percent_coverage_above_initial_distributions.savefig(
-    "percent_coverage_above_initial_distributions.png"
+    "percent_coverage_above_initial_distributions.png", bbox_inches='tight'
 )
 
 plt.show()

@@ -755,18 +755,18 @@ percent_above_initial_versus_iterations = plot_for_sensitivity_analysis(
 )
 plt.show()
 
-durations_versus_iterations.savefig("durations_versus_iterations.png")
-total_coverage_versus_iterations.savefig("total_coverage_versus_iterations.png")
+durations_versus_iterations.savefig("durations_versus_iterations.png", bbox_inches='tight')
+total_coverage_versus_iterations.savefig("total_coverage_versus_iterations.png", bbox_inches='tight')
 coverage_above_existing_versus_iterations.savefig(
-    "coverage_above_existing_versus_iterations.png"
+    "coverage_above_existing_versus_iterations.png", bbox_inches='tight'
 )
 coverage_above_initial_versus_iterations.savefig(
-    "coverage_above_initial_versus_iterations.png"
+    "coverage_above_initial_versus_iterations.png", bbox_inches='tight'
 )
-percent_coverage_versus_iterations.savefig("percent_coverage_versus_iterations.png")
+percent_coverage_versus_iterations.savefig("percent_coverage_versus_iterations.png", bbox_inches='tight')
 percent_above_existing_versus_iterations.savefig(
-    "percent_above_existing_versus_iterations.png"
+    "percent_above_existing_versus_iterations.png", bbox_inches='tight'
 )
 percent_above_initial_versus_iterations.savefig(
-    "percent_above_initial_versus_iterations.png"
+    "percent_above_initial_versus_iterations.png", bbox_inches='tight'
 )

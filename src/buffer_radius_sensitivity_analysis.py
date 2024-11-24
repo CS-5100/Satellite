@@ -754,12 +754,12 @@ percent_above_initial_versus_buffer = plot_for_sensitivity_analysis(
 )
 plt.show()
 
-durations_versus_buffer.savefig("duration_versus_buffer.png")
-total_coverage_versus_buffer.savefig("total_coverage_versus_buffer.png")
+durations_versus_buffer.savefig("duration_versus_buffer.png", bbox_inches='tight')
+total_coverage_versus_buffer.savefig("total_coverage_versus_buffer.png", bbox_inches='tight')
 coverage_above_existing_versus_buffer.savefig(
-    "coverage_above_existing_versus_buffer.png"
+    "coverage_above_existing_versus_buffer.png", bbox_inches='tight'
 )
-coverage_above_initial_versus_buffer.savefig("coverage_above_initial_versus_buffer.png")
-percent_coverage_versus_buffer.savefig("percent_coverage_versus_buffer.png")
-percent_above_existing_versus_buffer.savefig("percent_above_existing_versus_buffer.png")
-percent_above_initial_versus_buffer.savefig("percent_above_initial_versus_buffer.png")
+coverage_above_initial_versus_buffer.savefig("coverage_above_initial_versus_buffer.png", bbox_inches='tight')
+percent_coverage_versus_buffer.savefig("percent_coverage_versus_buffer.png", bbox_inches='tight')
+percent_above_existing_versus_buffer.savefig("percent_above_existing_versus_buffer.png", bbox_inches='tight')
+percent_above_initial_versus_buffer.savefig("percent_above_initial_versus_buffer.png", bbox_inches='tight')

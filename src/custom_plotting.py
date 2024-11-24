@@ -19,9 +19,9 @@ def plot_initial_final_satellites(existing_satellites: gpd.GeoDataFrame,
         buffer (_type_, optional): The radius of the circles to plot around each satellite in meters.
             If none, the points shown do not correlate to actual coverage areas. Defaults to None.
     """
-    initial_fig, initial_ax = plt.subplots(2, 1)
-    before_ax = initial_ax[0]
-    after_ax = initial_ax[1]
+    fig, ax = plt.subplots(2, 1)
+    before_ax = ax[0]
+    after_ax = ax[1]
 
     # add map data to both plots
     land.plot(ax=before_ax, color="#228B22")
@@ -72,5 +72,5 @@ def plot_initial_final_satellites(existing_satellites: gpd.GeoDataFrame,
         # the below color is apparently known as International Orange (Aerospace) and used in the aerospace industry
         final_positions.plot(ax=after_ax, color="#FF4F00", markersize=1)
 
-    # show the plot
-    plt.show()
+    # return the figure
+    return fig
