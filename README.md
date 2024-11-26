@@ -5,8 +5,8 @@ The repository contains a set of tools aimed at optimizing the placing of the St
 ## Table of Contents
 
 - [Project Overview](#project-overview)
+- [Approach](#approach)
 - [Getting Started](#getting-started)
-- [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Files](#files)
@@ -20,7 +20,7 @@ Low Earth Orbit (LEO) satellites operate at altitudes between 100-1,200 miles ab
 
 The SpaceX Starlink network is currently the most extensive and technologically advanced satellite constellation in low earth orbit, offering high-speed, low-latency broadband internet worldwide. This project addresses the optimization of satellite placement in the Starlink constellation to achieve maximum area coverage.
 
-## Local Search
+## Approach
 
 1. Hill Climbing:  
 This is a local search algorithm that helps find the best solution to a given problem. The process is analogous to climbing a hill where you continually seek to improve your position until you reach the peak, or maxima.  
@@ -62,10 +62,6 @@ sudo apt-get install python3.9
 sudo dnf install python3.9
 ```
 
-## Features
-
-1. **TLE Download and Conversion**: Download TLE data for satellite constellations, such as Starlink, directly from CelesTrak either as a text file, or live using the code provided [here](#download-and-process-tle-data). 
-
 ## Installation
 
 1. Clone the repository:
@@ -88,7 +84,7 @@ sudo dnf install python3.9
 
 ### Download and Process TLE Data
 
-To download the latest TLE data and store it as a GeoDataFrame:
+Download TLE data for satellite constellations, directly from CelesTrak either as a text file, or convert the satellite list to a `GeoDataFrame` using the code provided below.
 
 ```python
 import tle_processing as tlp
