@@ -32,7 +32,17 @@ BUFFER_PLOTS = True
 dirpath = Path(__file__).parent.resolve() / ".." / "data"
 
 def load_map_data():
-    # Load land and ocean map data (adjust paths as necessary)
+
+    """
+    This function reads geographic data for land and ocean areas from ZIP files
+    and converts them to a specified equal-area projection.
+
+    Returns:
+        tuple: A tuple containing two GeoDataFrames:
+            - land_map (geopandas.GeoDataFrame): Processed land area data.
+            - ocean_map (geopandas.GeoDataFrame): Processed ocean area data.
+    """
+    
     land_filepath = dirpath / "map_data" / "ne_10m_land_scale_rank.zip"
     ocean_filepath = dirpath / "map_data" / "ne_10m_ocean_scale_rank.zip"
     land_map = gpd.read_file(filename=land_filepath).to_crs(epsg=EQUAL_AREA_EPSG)
@@ -117,8 +127,7 @@ satellite_gdf = pd.concat([existing_satellites_gdf, new_satellites_gdf])
 land_map, ocean_map = load_map_data()
 
 def simulated_annealing(satellite_gdf, land_map, new_satellite_column, num_iterations=100,
-                        initial_temp=1000, cooling_rate=0.95, restart_threshold=10,
-                        max_steps_without_improvement=15, energy_difference_threshold=0.1):
+                        initial_temp=1000, cooling_rate=0.95, restart_threshold=10):
     best_gdf = satellite_gdf.copy()
     best_land_coverage = calculate_land_coverage(best_gdf, land_map)
     current_gdf = best_gdf.copy()
@@ -129,11 +138,8 @@ def simulated_annealing(satellite_gdf, land_map, new_satellite_column, num_itera
     iteration_times = []
     best_land_coverage_list = []
 
-    # List for storing improved solutions
-    improvement_solutions = [(best_land_coverage, best_gdf.copy())]
-
-    # Counters for restart criteria
-    steps_without_improvement = 0
+    # Restart counter
+    stagnation_counter = 0
 
     for iteration in range(num_iterations):
         start_time = time.time()  # Start timing the iteration
@@ -141,7 +147,7 @@ def simulated_annealing(satellite_gdf, land_map, new_satellite_column, num_itera
 
         # Perturb positions of new satellites only
         new_gdf = current_gdf.copy()
-        perturb_positions(new_gdf, new_satellite_column, random_state=random.randint(0, 10000))
+        perturb_positions(new_gdf, new_satellite_column, random_state=randint(0, 10000))
 
         # Calculate new land coverage area
         new_land_coverage = calculate_land_coverage(new_gdf, land_map)
@@ -155,37 +161,26 @@ def simulated_annealing(satellite_gdf, land_map, new_satellite_column, num_itera
         if delta_coverage > 0 or random.uniform(0, 1) < acceptance_probability:
             print(f"Accepted new configuration with land coverage: {new_land_coverage:.2f} km²")
             current_gdf, current_land_coverage = new_gdf, new_land_coverage
-            steps_without_improvement = 0  # Reset steps without improvement
-
-            # Update the best solution if this configuration is better
+            stagnation_counter = 0  # Reset stagnation counter
+            # Update best solution if this is the best encountered so far
             if new_land_coverage > best_land_coverage:
                 best_gdf, best_land_coverage = new_gdf, new_land_coverage
-
-            # Store new solution if it's an improvement and unique
-            if not any(abs(new_land_coverage - cov) < 1e-6 for cov, _ in improvement_solutions):
-                improvement_solutions.append((new_land_coverage, new_gdf.copy()))
         else:
             print("Retained current configuration.")
-            steps_without_improvement += 1  # Increment if no improvement
 
         # Cooling step
         temperature *= cooling_rate
 
-        # Restart criteria: if no improvement over max_steps_without_improvement or significant drop in energy
-        if steps_without_improvement >= max_steps_without_improvement or \
-           (best_land_coverage - current_land_coverage) / best_land_coverage > energy_difference_threshold:
-            print("Restarting due to lack of improvement or significant drop in coverage.")
+        # Increment stagnation counter if no improvement
+        stagnation_counter += 1
 
-            # Randomly select an improved solution to restart from
-            if improvement_solutions:
-                selected_coverage, selected_gdf = random.choice(improvement_solutions)
-                current_gdf = selected_gdf.copy()  # Restart from the chosen solution
-                current_land_coverage = selected_coverage
-            else:
-                current_gdf = best_gdf.copy()  # Default to the best solution if no other improvements exist
-
-            temperature = initial_temp  # Reset temperature
-            steps_without_improvement = 0  # Reset the stagnation counter
+        # Check if we should restart due to stagnation
+        if stagnation_counter >= restart_threshold:
+            print("Random restart due to stagnation.")
+            current_gdf = satellite_gdf.copy()
+            current_land_coverage = calculate_land_coverage(current_gdf, land_map)
+            stagnation_counter = 0  # Reset the stagnation counter
+            temperature = initial_temp  # Reset temperature for new start
 
         # Track iteration times and best land coverage
         elapsed_time = time.time() - start_time
