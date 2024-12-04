@@ -82,15 +82,34 @@ sudo dnf install python3.9
 
 ## Usage
 
-### Download and Process TLE Data
+### Data Preprocessing
 
-Download TLE data for satellite constellations, directly from CelesTrak either as a text file, or convert the satellite list to a `GeoDataFrame` using the code provided below.
+The `geodataframe_processing.py` file handles several critical preprocessing tasks related to map data and satellite positions. Below are the key functions and their purposes:
 
+#### 1. Loading Map Data
+We load land and ocean map data (stored in the `data/map_data/` directory) and convert it to a GeoDataFrame with a specified Coordinate Reference System (CRS) which is essential for analyzing satellite coverage.  
+
+**Usage:**  
 ```python
-import tle_processing as tlp
+land_map = load_map_data("ne_10m_land_scale_rank.zip", EPSG=6933)
+ocean = load_map_data("ne_10m_ocean_scale_rank.zip", EPSG=6933)
+```
 
-# Download and convert TLE data to GeoDataFrame for existing satellites
-current_tle = tlp.download_current_tles_as_list()
-tle_df = tlp.tles_to_dataframe(raw_tle_list=current_tle)
-satellite_gdf = tlp.tle_dataframe_to_geodataframe(tle_df)
+#### 2. Loading existing Satellite Data
+We fetch existing Starlink Satellite in TLE (Two-Line Element) format from CelesTrak and convert it into a GeoDataFrame, projecting the data into the specified CRS.
+
+**Usage:**
+```python
+existing_satellites = load_existing_satellites(EPSG=4326)
+```
+
+#### 3. Perturb Satellite Positions
+We perturb the positions of new satellites by a random amount up to a specified maximum shift (in kilometers). The function ensures that satellites stay within valid geographic boundaries and adjusts their coordinates accordingly.
+
+#### 4. Calculate Coverage Area
+We then calculate the area covered by the set of satellites. This is or objective function. The local search algorithms implemented aim to maximize the area covered.
+
+**Usage:**
+```python
+coverage_area = calculate_land_coverage(satellites_gdf, land_map)
 ```
