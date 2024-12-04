@@ -100,13 +100,26 @@ We fetch existing Starlink Satellite in TLE (Two-Line Element) format from Celes
 
 **Usage:**
 ```python
-existing_satellites = load_existing_satellites(EPSG=4326)
+existing_satellites = load_existing_satellites(EPSG=6933)
 ```
 
-#### 3. Perturb Satellite Positions
-We perturb the positions of new satellites by a random amount up to a specified maximum shift (in kilometers). The function ensures that satellites stay within valid geographic boundaries and adjusts their coordinates accordingly.
+#### 3. Generate New Satellites
+We use a function to generate the number of additional satellites to be potentially launched to orbit. The `generate_new_satellites` function creates a new set of randomly positioned satellite candidates and returns them as a GeoDataFrame. 
 
-#### 4. Calculate Coverage Area
+**Usage:**
+```python
+new_satellites = generate_new_satellites(num_satellites=60)
+```
+
+#### 4. Perturb Satellite Positions
+We perturb the positions of new satellites by a random amount up to a specified maximum shift (in kilometers). The function ensures that satellites stay within valid geographic boundaries and adjusts their coordinates accordingly. This is done to find neighboring configurations that might improve coverage area.
+
+**Usage:**
+```python
+perturb_positions(new_gdf, new_satellite_column, max_shift_km=500)
+```
+
+#### 5. Calculate Coverage Area
 We then calculate the area covered by the set of satellites. This is or objective function. The local search algorithms implemented aim to maximize the area covered.
 
 **Usage:**
