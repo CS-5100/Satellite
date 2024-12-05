@@ -9,7 +9,7 @@ The repository contains a set of tools aimed at optimizing the placing of the St
 - [Getting Started](#getting-started)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Files](#files)
+- [Results](#results)
 
 ---
 ## Project Overview
@@ -128,7 +128,13 @@ coverage_area = calculate_land_coverage(satellites_gdf, land_map)
 ### Local Search
 The `localSearch.py` performs the hill climbing algorithm and the `simulated_annealing.py` performs the simulated annealing algorithm discussed above to find optimal satellite placement. 
 
-## Files
+## Results
 The `hillclimbing_averagecoverage.py` and `simulatedannealing_averagecoverage.py` measure the average coverage area added using the hill climbing and simulated annealing algorithms respectively.
 
 ![plot](./results/coveragearea_added.png)
+
+The above plot shows the added coverage area above initial configuration. As expected, the simulated annealing adds more area in comparison to the hill climbing, although the addition is only about 3500 sq. km.
+
+![plot](./results/episode_medians.png)
+
+The above plot demonstrates how the added coverage area varies with the number of iterations. As the number of iterations increase, coverage area tends to increase, but this is computationally expensive since Starlink has about 6000 satellites that are currently in orbit.
