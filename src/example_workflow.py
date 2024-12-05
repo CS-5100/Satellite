@@ -15,7 +15,7 @@ EQUAL_AREA_EPSG = 6933
 BASE_BUFFER = 12065
 TLE_TIME = datetime(2024, 11, 14, 16, 12, 32, 202983)
 PERTURB_DISTANCE_KM = 100
-LOCAL_SEARCH_ITERATIONS = 1
+LOCAL_SEARCH_ITERATIONS = 10
 
 
 # Importing a set of TLEs as the existing satellites
@@ -48,7 +48,7 @@ satellite_gdf = pd.concat([base_gdf, initial_candidate_gdf])
 # and return the optimal satellites
 optimized_gdf, _, _, _ = random_restart_simulated_annealing(
     satellite_gdf=satellite_gdf,
-    map=land_map,
+    input_map=land_map,
     new_satellite_column="new_satellite",
     buffer_radius=BASE_BUFFER,
     equal_distance_epsg=EQUAL_DISTANCE_EPSG,
