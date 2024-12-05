@@ -128,6 +128,15 @@ coverage_area = calculate_land_coverage(satellites_gdf, land_map)
 ### Local Search
 The `localSearch.py` performs the hill climbing algorithm and the `simulated_annealing.py` performs the simulated annealing algorithm discussed above to find optimal satellite placement. 
 
+**Usage:**
+```python
+# running hill climbing algorithm
+python localSearch.py
+
+# running simulated annealing
+python simulated_annealing.py
+```
+
 ## Results
 The `hillclimbing_averagecoverage.py` and `simulatedannealing_averagecoverage.py` measure the average coverage area added using the hill climbing and simulated annealing algorithms respectively.
 
