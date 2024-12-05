@@ -10,13 +10,11 @@ The repository contains a set of tools aimed at optimizing the placing of the St
 - [Installation](#installation)
 - [Usage](#usage)
 - [Files](#files)
-- [Contributing](#contributing)
-- [License](#license)
 
 ---
 ## Project Overview
 
-Low Earth Orbit (LEO) satellites operate at altitudes between 100-1,200 miles above Earth's surface, enabling global communications with reduced signal latency and higher data transfer speeds compared to traditional satellites. However, these satellites face certain limitations - their relatively short operational lifespan of approximately 7-10 years5, requiring frequent replacements to maintain network coverage.  
+Low Earth Orbit (LEO) satellites operate at altitudes between 100-1,200 miles above Earth's surface, enabling global communications with reduced signal latency and higher data transfer speeds compared to traditional satellites. However, these satellites face certain limitations - their relatively short operational lifespan of approximately 7-10 years, requiring frequent replacements to maintain network coverage.  
 
 The SpaceX Starlink network is currently the most extensive and technologically advanced satellite constellation in low earth orbit, offering high-speed, low-latency broadband internet worldwide. This project addresses the optimization of satellite placement in the Starlink constellation to achieve maximum area coverage.
 
@@ -126,3 +124,11 @@ We then calculate the area covered by the set of satellites. This is or objectiv
 ```python
 coverage_area = calculate_land_coverage(satellites_gdf, land_map)
 ```
+
+### Local Search
+The `localSearch.py` performs the hill climbing algorithm and the `simulated_annealing.py` performs the simulated annealing algorithm discussed above to find optimal satellite placement. 
+
+## Files
+The `hillclimbing_averagecoverage.py` and `simulatedannealing_averagecoverage.py` measure the average coverage area added using the hill climbing and simulated annealing algorithms respectively.
+
+![plot](./results/coveragearea_added.png)
