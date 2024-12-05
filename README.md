@@ -137,6 +137,14 @@ python localSearch.py
 python simulated_annealing.py
 ```
 
+![plot](./results/satellite_positions.png)
+
+The above plot showcases the optimized satellite positions after running simulated annealing for about 200 iterations for 30 new satellites (only the first ten are displayed for demonstration).
+
+![plot](./results/world_plot.png)
+
+The above plot showcases the satellite positions projected onto a world map. The red dots show the positions of the new satellites.
+
 ## Results
 The `hillclimbing_averagecoverage.py` and `simulatedannealing_averagecoverage.py` measure the average coverage area added using the hill climbing and simulated annealing algorithms respectively.
 
